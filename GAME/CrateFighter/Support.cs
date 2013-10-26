@@ -25,7 +25,7 @@ namespace CrateFighter
 	{
 		public static TextureFilterMode DefaultTextureFilterMode = TextureFilterMode.Linear;	//Type of texture filtering
 		public static Dictionary<string, Texture2D> TextureCache = new Dictionary<string, Texture2D>();	//A list of textures that have been loaded in
-		public static Dictionary<string, TextureInfo> TextureInfoCache = new Dictionary<string, TextureInfo>();	//A list of the information about textures that have been loaded in
+		public static Dictionary<string, TextureInfo> TextureInfoCache = new Dictionary<string, TextureInfo>();	//A list of the information about textures that have been loaded in=
 		
 		public static Sce.PlayStation.HighLevel.GameEngine2D.SpriteTile SpriteFromFile(string filename)
 		{

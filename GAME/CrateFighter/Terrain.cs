@@ -18,7 +18,7 @@ using Sce.PlayStation.HighLevel.GameEngine2D.Base;
 
 namespace CrateFighter
 {	
-	public class Terrain
+	public class Terrain : boxCollider
 	{
 		private SpriteTile terrainSprite;	//This terrains sprite
 		private Vector2 terrainPosition;	//Terrains current position in the world
@@ -33,6 +33,7 @@ namespace CrateFighter
 			terrainSize = new Vector2( width, height );	//Store the terrains size
 			Game.Instance.GameScene.AddChild(terrainSprite, 1);	//Add the sprite to the scene
 			TerrainList.instance.AddTerrainObject(this);	//Add this object to the list of terrain objects that have been created
+			this.Set ( terrainPosition, width, height );
 		}
 		
 		public Vector2 GetSize()
