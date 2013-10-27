@@ -75,12 +75,12 @@
     <Content Include="assets\platformPlaceholder.png" />
     <Content Include="assets\playerPlaceholder.png" />
     <Content Include="assets\guitest.png" />
-    <Content Include="assets\NINJA2.png" />
     <Content Include="assets\amazingMusic.mp3" />
     <Content Include="assets\cathedral.jpg" />
     <Content Include="assets\sfx\jump1.wav" />
     <Content Include="assets\sfx\jump2.wav" />
     <Content Include="assets\sfx\jump3.wav" />
     <Content Include="assets\sfx\jump4.wav" />
+    <Content Include="assets\playerIdle.png" />
   </ItemGroup>
 </Project>

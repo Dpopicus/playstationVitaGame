@@ -24,7 +24,14 @@ namespace CrateFighter
 		Sound jumpThreeSound;
 		Sound jumpFourSound;
 		
+		private SpriteTile currentSprite;
 		private SpriteTile playerSprite;//Player sprite
+		private SpriteTile idleSprite;
+		
+		private bool facingRight; //This is used to determine whether or not to flip the player sprites
+		private Vector2 previousPosition; //Compares current position with previous position to see which
+											//direction the player is moving
+		
 		private Vector2 playerPosition;	//Players current position in the world
 		private int playerWidth;
 		private int playerHeight;
@@ -54,15 +61,31 @@ namespace CrateFighter
 			jumpThreeSound = new Sound("/Application/assets/sfx/jump3.wav");
 			jumpFourSound = new Sound("/Application/assets/sfx/jump4.wav");
 			
-			playerWidth = 50;
+			playerWidth = 46;
+			playerHeight = 109;
 			SpawnPoint = new Vector2();
 			SpawnPoint.X = 100;
 			SpawnPoint.Y = 100;
-			playerHeight = 50;
 			playerPosition.X = SpawnPoint.X;	//Set the players initial x position
 			playerPosition.Y = SpawnPoint.Y;	//Set the players initial y position
+			facingRight = true;
+			previousPosition = playerPosition;
+			
+			//\====================
+			//\Create player sprites
+			//\====================
+			
 			playerSprite = Support.TiledSpriteFromFile( "Application/assets/playerPlaceholder.png",1 ,1 ); // image name and the fraction of the base image that each frame will take up
 			playerSprite.Quad.S = new Vector2(playerWidth, playerHeight);
+			Game.Instance.GameScene.AddChild(playerSprite, 2);	//Add this sprite as a child to the game scene
+			playerSprite.Visible = false;
+			
+			idleSprite = Support.TiledSpriteFromFile ( "Application/assets/playerIdle.png", 1, 1 );
+			idleSprite.Quad.S = new Vector2(playerWidth, playerHeight);
+			Game.Instance.GameScene.AddChild(idleSprite, 2);
+			
+			currentSprite = idleSprite;
+		
 			isFalling = true;
 			NormalMovementSpeed = 10.0f;
 			SprintingMovementSpeed = 20.0f;
@@ -71,8 +94,6 @@ namespace CrateFighter
 			MaxFallingSpeed = 15.0f;
 			JumpStrength = 50.0f;
 			GravityStrength = 2.0f;
-
-			Game.Instance.GameScene.AddChild(playerSprite, 2);	//Add this sprite as a child to the game scene
 		}
 		
 		public void MovePlayer( float xPos, float yPos )
@@ -82,10 +103,31 @@ namespace CrateFighter
 			playerSprite.Quad.T = playerPosition;
 		}
 		
+		public void Update()
+		{
+			UpdateSprite ();
+			GetInput();
+			this.Set ( playerPosition, playerWidth, playerHeight);//Update the players box collider information
+			CheckEnvironmentCollisions();
+		}
+		
+		public void UpdateSprite()
+		{
+			if ( previousPosition.X == playerPosition.X )
+				return;
+			
+			facingRight = previousPosition.X > playerPosition.X ? false : true;
+			if (facingRight)
+				currentSprite.FlipU = false;
+			else
+				currentSprite.FlipU = true;
+			previousPosition = playerPosition;
+		}
+		
 		public void UpdatePosition( Vector2 dp )
 		{
 			playerPosition = dp;
-			playerSprite.Quad.T = playerPosition;
+			currentSprite.Quad.T = playerPosition;
 		}
 		
 		public Vector2 GetPosition()
@@ -133,18 +175,22 @@ namespace CrateFighter
 					{
 					case 0:
 						soundPlayerBullet = jumpOneSound.CreatePlayer();
+						soundPlayerBullet.Volume = .3f;
 						soundPlayerBullet.Play();
 						break;
 					case 1:
 						soundPlayerBullet = jumpTwoSound.CreatePlayer();
+						soundPlayerBullet.Volume = .3f;
 						soundPlayerBullet.Play();
 						break;
 					case 2:
 						soundPlayerBullet = jumpThreeSound.CreatePlayer();
+						soundPlayerBullet.Volume = .3f;
 						soundPlayerBullet.Play();
 						break;
 					case 3:
 						soundPlayerBullet = jumpFourSound.CreatePlayer();
+						soundPlayerBullet.Volume = .3f;
 						soundPlayerBullet.Play();
 						break;
 					}
@@ -215,13 +261,6 @@ namespace CrateFighter
 		{
 			
 			UpdatePosition( dp );
-		}
-		
-		public void Update()
-		{
-			GetInput();
-			this.Set ( playerPosition, playerWidth, playerHeight);//Update the players box collider information
-			CheckEnvironmentCollisions();
 		}
 		
 		private void Respawn()
