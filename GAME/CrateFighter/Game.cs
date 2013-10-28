@@ -33,9 +33,8 @@ namespace CrateFighter
 		
 		public Player playerInstance;	//Instance of the player class
 		
-		public Terrain ground;
-		public Terrain leftWall;
-		public Terrain rightWall;
+		public Ground ground;
+		public Wall leftWall;
 		
 		public Enemy enemyInstance;
 		
@@ -104,12 +103,11 @@ namespace CrateFighter
 			Support.MusicSystem.Instance.PlayNoClobber("amazingMusic.mp3", true);	//Play some music for the first level
 			
 			playerInstance = new Player();	//Create a player
-			//enemyInstance = new Enemy();
+			enemyInstance = new Enemy();
 			guiTest = new GUI();
 			
-			ground = new Terrain( "Application/assets/platformPlaceholder.png", 0, 0, 1000, 25 );
-			leftWall = new Terrain( "Application/assets/platformPlaceholder.png", -50, 250, 100, 25 );
-			rightWall = new Terrain( "Application/assets/platformPlaceholder.png", 1000, 0, 25, 1000 );
+			ground = new Ground( "Application/assets/platformPlaceholder.png", 0, 0, 1000, 25 );
+			leftWall = new Wall( "Application/assets/platformPlaceholder.png", 0, 0, 50, 500 );
 		}
 		
 		public void TickGame(float dt)
@@ -127,7 +125,13 @@ namespace CrateFighter
 		private void UpdateGame()
 		{
 			playerInstance.Update();
-			//enemyInstance.Update();
+			enemyInstance.Update();
+			GetPlayerPos();
+		}
+		
+		public void GetPlayerPos()
+		{
+			enemyInstance.GetPlayerPos ( playerInstance.GetPosition().X, playerInstance.GetPosition().Y );
 		}
 	}
 }

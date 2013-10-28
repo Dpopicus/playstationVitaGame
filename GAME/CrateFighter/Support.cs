@@ -48,6 +48,36 @@ namespace CrateFighter
 			return result;
 		}
 		
+		public static void SetTile(Sce.PlayStation.HighLevel.GameEngine2D.SpriteTile sprite, int n)
+		{
+            sprite.TileIndex1D = n;
+		}
+		
+		public static int IncrementTile(Sce.PlayStation.HighLevel.GameEngine2D.SpriteTile sprite, int steps, int min, int max, bool looping)
+		{
+			int x = sprite.TextureInfo.NumTiles.X;
+			int y = sprite.TextureInfo.NumTiles.Y;
+			
+			int current = sprite.TileIndex2D.X + sprite.TileIndex2D.Y * x;
+			
+			if (looping)
+			{
+				current -= min;
+				current += steps;
+				current %= max - min;
+				current += min;
+			}
+			else
+			{
+				current += steps;
+				current = System.Math.Min(current, max - 1);
+			}
+			
+            sprite.TileIndex1D = current;
+			
+			return current;
+		}
+		
 		public static Sce.PlayStation.HighLevel.GameEngine2D.SpriteTile SpriteFromFile(string filename, float width, float height)
 		{
 			if(TextureCache.ContainsKey (filename) == false)
@@ -103,6 +133,23 @@ namespace CrateFighter
 
 			tex.SetFilter(DefaultTextureFilterMode);
 
+			return result;
+		}
+		
+		public static Sce.PlayStation.HighLevel.GameEngine2D.SpriteUV SpriteUVFromFile(string filename, int x, int y)
+		{
+			if (TextureCache.ContainsKey(filename) == false)
+			{
+				TextureCache[filename] = new Texture2D(filename, false);
+				TextureInfoCache[filename] = new TextureInfo(TextureCache[filename], new Vector2i(x, y));
+			}
+			
+			var tex = TextureCache[filename];
+			var info = TextureInfoCache[filename];
+			var result = new Sce.PlayStation.HighLevel.GameEngine2D.SpriteUV() { TextureInfo = info };
+			
+			result.Quad.S = new Vector2(info.Texture.Width / x, info.Texture.Height / y);
+			tex.SetFilter(DefaultTextureFilterMode);
 			return result;
 		}
 		
@@ -162,6 +209,81 @@ namespace CrateFighter
 				}
 
 				Play(name, loop);
+			}
+		}
+		
+		public class AnimationAction
+			: Sce.PlayStation.HighLevel.GameEngine2D.ActionBase
+		{
+			int animation_start;
+			int animation_end;
+			Sce.PlayStation.HighLevel.GameEngine2D.SpriteTile attached_sprite;
+			float counter;
+			float frame_time;
+			float speed;
+			bool looping;
+			
+			public AnimationAction(Sce.PlayStation.HighLevel.GameEngine2D.SpriteTile sprite, float seconds)
+				: this(sprite, 0, sprite.TextureInfo.NumTiles.X * sprite.TextureInfo.NumTiles.Y, seconds)
+			{
+			}
+			
+			public AnimationAction(Sce.PlayStation.HighLevel.GameEngine2D.SpriteTile sprite, int a, int b, float seconds, bool looping = false)
+			{
+				this.looping = looping;
+				speed = 1.0f;
+				
+				attached_sprite = sprite;
+				
+				int min = System.Math.Min(a, b);
+				int max = System.Math.Max(a, b);
+				int frames = System.Math.Max(1, max - min);	
+				
+				frame_time = seconds / (float)frames;
+				animation_start = min;
+				animation_end = max;
+				
+				Reset();
+			}
+			
+			public override void Run()
+			{
+				base.Run();
+				Reset();
+			}
+			
+			public override void Update(float dt)
+			{
+				dt *= speed;
+				
+				base.Update(dt);
+				
+				counter += dt;
+				
+				int frames = 0;
+				while (frame_time > 0.0f && counter > frame_time)
+				{
+					counter -= frame_time;
+					frames += 1;
+				}
+				
+				int tile_index = IncrementTile(attached_sprite, frames, animation_start, animation_end, looping);
+				
+				if (!looping && tile_index == animation_end - 1)
+				{
+					Stop();
+				}
+			}
+			
+			public void SetSpeed(float speed)
+			{
+				this.speed = speed;
+			}
+			
+			public void Reset()
+			{
+				counter = 0.0f;
+				SetTile(attached_sprite, animation_start);
 			}
 		}
 	}

@@ -14,6 +14,12 @@ namespace CrateFighter
 		private Vector2 enemySize;	//width and height of the player
 		
 		private float CurrentFallSpeed;
+		private float NormalMovementSpeed;
+		private Vector2 PlayerPosition;
+		
+		private bool OnScreen;
+		private bool MoveLeft;
+		private bool MoveRight;
 		
 		private bool Falling;
 		
@@ -21,15 +27,20 @@ namespace CrateFighter
 		{
 			if ( EnemyList.instance == null )
 				EnemyList.instance = new EnemyList();
-			enemyPosition.X = 200;
+			enemyPosition.X = 500;
 			enemyPosition.Y = 400;
+			PlayerPosition.X = 100;
+			PlayerPosition.Y = 100;
 			enemySize.X = 15;
 			enemySize.Y = 15;
 			enemySprite = Support.TiledSpriteFromFile( "Application/assets/platformPlaceholder.png",1 ,1 );
-			
+			OnScreen = false;
 			CurrentFallSpeed = - 5.0f;
 			Game.Instance.GameScene.AddChild(enemySprite, 2);
 			EnemyList.instance.AddEnemyObject(this);
+			NormalMovementSpeed = 9.0f;
+			MoveLeft = false;
+			MoveRight = false;
 		}
 		
 		public Vector2 GetSize()
@@ -53,36 +64,62 @@ namespace CrateFighter
 		{
 			if (Falling)
 				enemyPosition.Y += CurrentFallSpeed;
+			if (MoveRight)
+				enemyPosition.X += NormalMovementSpeed;
+			if (MoveLeft)
+				enemyPosition.X -= NormalMovementSpeed;
 			
 			enemySprite.Quad.T = enemyPosition;
 			Gravity();	
 		}
 		
+		public void CheckOnScreen()
+		{
+			if (enemyPosition.X > (PlayerPosition.X - 480))
+			{
+				if ( enemyPosition.X < ( PlayerPosition.X + 480) )
+				{
+					OnScreen = true;
+				}
+			}
+		}
+		
 		public void CheckEnvironmentCollisions()
 		{
-			if ( TerrainList.instance != null )
+			if ( groundList.instance != null )
 			{
-				for ( int i = 0; i < TerrainList.instance.objectCounter; i++ )
+				for ( int i = 0; i < groundList.instance.objectCounter; i++ )
 				{
 					if ( Falling )
 					{
-						if (!( enemyPosition.Y <= TerrainList.instance.terrainObjects[i].GetPosition().Y ))
+						if (!( enemyPosition.Y <= groundList.instance.groundObjects[i].GetPosition().Y ))
 						{//First make sure the player isn't already below the object we are checking collision for
-							if ( (enemyPosition.Y + CurrentFallSpeed)  <= ( TerrainList.instance.terrainObjects[i].GetPosition().Y + TerrainList.instance.terrainObjects[i].GetSize().Y )  )
+							if ( (enemyPosition.Y + CurrentFallSpeed)  <= ( groundList.instance.groundObjects[i].GetPosition().Y + groundList.instance.groundObjects[i].GetSize().Y )  )
 							{
 								//if we get here in here we need to make sure the player is interacting with the
 							//terrain object, anywhere on the x axis
-								if (( enemyPosition.X + enemySize.X ) > TerrainList.instance.terrainObjects[i].GetPosition().X )
+								if (( enemyPosition.X + enemySize.X ) > groundList.instance.groundObjects[i].GetPosition().X )
 								{
-									if ( enemyPosition.X < ( TerrainList.instance.terrainObjects[i].GetPosition().X + TerrainList.instance.terrainObjects[i].GetSize().X ) )
+									if ( enemyPosition.X < ( groundList.instance.groundObjects[i].GetPosition().X + groundList.instance.groundObjects[i].GetSize().X ) )
 									{
 										Falling = false;
-										enemyPosition.Y = ( TerrainList.instance.terrainObjects[i].GetPosition().Y + TerrainList.instance.terrainObjects[i].GetSize().Y); //incase the player was going to stop shy of the ground 
+										enemyPosition.Y = ( groundList.instance.groundObjects[i].GetPosition().Y + groundList.instance.groundObjects[i].GetSize().Y); //incase the player was going to stop shy of the ground 
 									}
 								}
 							}
 						}
 					}
+				}
+			}
+			if( OnScreen  )
+			{
+				if( enemyPosition.X < PlayerPosition.X)
+				{
+					MoveRight = true;
+				}
+				else if( enemyPosition.X > PlayerPosition.X)
+				{
+					MoveLeft = true;
 				}
 			}
 			UpdatePosition();
@@ -91,8 +128,18 @@ namespace CrateFighter
 		public void Update()
 		{
 			Falling = true;
+			MoveRight = false;
+			MoveLeft = false;
+			CheckOnScreen();
 			CheckEnvironmentCollisions();
 		}
+		
+		public void GetPlayerPos( float xPos, float yPos )
+		{
+			PlayerPosition.X = xPos;
+			PlayerPosition.Y = yPos;
+		}
+		
 		public void Gravity()
 		{
 			if (CurrentFallSpeed != - 10.0f)

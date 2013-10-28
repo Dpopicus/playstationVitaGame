@@ -49,10 +49,13 @@
       <Link>menu.cs</Link>
     </Compile>
     <Compile Include="Player.cs" />
-    <Compile Include="Terrain.cs" />
     <Compile Include="GUI.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="boxCollider.cs" />
+    <Compile Include="Ground.cs" />
+    <Compile Include="Wall.cs" />
+    <Compile Include="TerrainObjects.cs" />
+    <Compile Include="BaseTerrain.cs" />
   </ItemGroup>
   <ItemGroup>
     <ShaderProgram Include="shaders\Simple.fcg" />
@@ -82,5 +85,7 @@
     <Content Include="assets\sfx\jump3.wav" />
     <Content Include="assets\sfx\jump4.wav" />
     <Content Include="assets\playerIdle.png" />
+    <Content Include="assets\combinedImage.jpg" />
+    <Content Include="assets\zombie_frames.png" />
   </ItemGroup>
 </Project>
