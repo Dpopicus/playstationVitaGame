@@ -27,11 +27,11 @@ namespace CrateFighter
 		private SpriteTile currentSprite;
 		private SpriteTile playerSprite;//Player sprite
 		private SpriteTile idleSprite;
+		private Vector2 attackPosition;
+		private int attackWidth;
+		private int attackHeight;
 		
-		private SpriteUV herp;
-		
-		private Support.AnimationAction IdleAnimation { get; set; }
-		private Sce.PlayStation.HighLevel.GameEngine2D.SpriteTile Sprite { get; set; }
+		private boxCollider Attack;
 		
 		private bool facingRight; //This is used to determine whether or not to flip the player sprites
 		private Vector2 previousPosition; //Compares current position with previous position to see which
@@ -45,6 +45,8 @@ namespace CrateFighter
 		private float NormalMovementSpeed;	//The normal walking speed for the player
 		private float SprintingMovementSpeed;
 		
+		Animation derp;
+		
 		private bool moveLeft;
 		private bool moveRight;
 		
@@ -53,18 +55,10 @@ namespace CrateFighter
 		private BaseTerrain groundObject;
 		
 		private bool isFalling;
-		private bool isWallSliding;
-		
-		private float NormalGravityStrength;
-		private float WallSlideGravityStrength;
-		private float CurrentGravityStrength;
-		
+		private float GravityStrength;
 		private float VerticalVelocity;
 		private float MaxFallingSpeed;
-		
-		private float NormalJumpStrength;
-		private float SlideJumpStrength;
-		private float CurrentJumpStrength;
+		private float JumpStrength;
 		
 		private Vector2 SpawnPoint;
 		
@@ -74,6 +68,13 @@ namespace CrateFighter
 			jumpTwoSound = new Sound("/Application/assets/sfx/jump2.wav");
 			jumpThreeSound = new Sound("/Application/assets/sfx/jump3.wav");
 			jumpFourSound = new Sound("/Application/assets/sfx/jump4.wav");
+			
+			derp = new Animation();
+			derp.LoadAnimation("playerRun");
+			
+			attackPosition = playerPosition;
+			attackWidth = 15;
+			attackHeight = 15;
 			
 			playerWidth = 46;
 			playerHeight = 109;
@@ -98,12 +99,8 @@ namespace CrateFighter
 			idleSprite.Quad.S = new Vector2(playerWidth, playerHeight);
 			Game.Instance.GameScene.AddChild(idleSprite, 2);
 			
-			herp = Support.SpriteUVFromFile ( "Application/assets/zombie_frames.png", 1, 1 );
-			Game.Instance.GameScene.AddChild( herp, 2 );
-			herp.UV.T = new Vector2( 0, 0 );	//this is the bottom left which is drawn
-			herp.UV.S = new Vector2( 0.5f, 0.5f );	//this is the top right point which is drawn
-				
 			currentSprite = idleSprite;
+			Attack = new boxCollider();
 		
 			isFalling = true;
 			NormalMovementSpeed = 10.0f;
@@ -111,14 +108,9 @@ namespace CrateFighter
 			CurrentMovementSpeed = NormalMovementSpeed;
 			VerticalVelocity = 0.0f;
 			MaxFallingSpeed = 15.0f;
+			JumpStrength = 50.0f;
+			GravityStrength = 2.0f;
 			
-			NormalJumpStrength = 50.0f;
-			SlideJumpStrength = 25.0f;
-			CurrentJumpStrength = NormalJumpStrength;
-			
-			NormalGravityStrength = 2.0f;
-			CurrentGravityStrength = NormalGravityStrength;
-			WallSlideGravityStrength = 0.5f;
 		}
 		
 		public void MovePlayer( float xPos, float yPos )
@@ -140,11 +132,6 @@ namespace CrateFighter
 		{
 			if ( previousPosition.X == playerPosition.X )
 				return;
-			else
-			{
-				isWallSliding = false;
-				CurrentJumpStrength = NormalJumpStrength;
-			}
 			
 			facingRight = previousPosition.X > playerPosition.X ? false : true;
 			if (facingRight)
@@ -172,12 +159,13 @@ namespace CrateFighter
 			
 			if ( (PadData.Buttons & GamePadButtons.Circle) != 0 )
 				Respawn ();
+			if ( (PadData.Buttons & GamePadButtons.Square ) != 0 )
+				checkRange ();
 			moveLeft = ((PadData.AnalogLeftX < 0.0f ) || ((PadData.Buttons & GamePadButtons.Left) != 0)) ? true : false;
 			moveRight = ((PadData.AnalogLeftX > 0.0f ) || ((PadData.Buttons & GamePadButtons.Right) != 0)) ? true : false;
 			CurrentMovementSpeed = ((PadData.Buttons & GamePadButtons.Square) != 0) ? SprintingMovementSpeed : NormalMovementSpeed;
 			if ( !isFalling )
 				Jump = ((PadData.Buttons & GamePadButtons.Cross) != 0) ? true : false;
-			CurrentGravityStrength = isWallSliding ? WallSlideGravityStrength : NormalGravityStrength;
 		}
 		
 		private void CheckEnvironmentCollisions()
@@ -192,13 +180,13 @@ namespace CrateFighter
 				desiredPosition.X -= moveLeft ? CurrentMovementSpeed : 0;
 				
 				if ( isFalling && ( VerticalVelocity <= MaxFallingSpeed ) )
-					VerticalVelocity -= CurrentGravityStrength;
+					VerticalVelocity -= GravityStrength;
 				if ( VerticalVelocity > MaxFallingSpeed )
 					VerticalVelocity = MaxFallingSpeed;
 				
 				if ( Jump )
 				{
-					VerticalVelocity += CurrentJumpStrength;
+					VerticalVelocity += JumpStrength;
 					isFalling = true;
 					Jump = false;
 					var r = new Random();
@@ -228,6 +216,10 @@ namespace CrateFighter
 				}
 				
 				desiredPosition.Y += isFalling ? VerticalVelocity : 0;
+				/*
+				desiredPosition.Y += moveUp ? CurrentMovementSpeed : 0;
+				desiredPosition.Y -= moveDown ? CurrentMovementSpeed : 0;
+				*/
 				desiredLocation.Set( desiredPosition, playerWidth, playerHeight );
 				
 				foreach ( BaseTerrain obj in terrainList )
@@ -280,11 +272,6 @@ namespace CrateFighter
 									desiredPosition.X += ( ( obj.position.X + obj.width ) - desiredLocation.position.X );
 									desiredLocation.Set(desiredPosition, playerWidth, playerHeight);
 									moveLeft = false;
-									if(isFalling)
-									{
-										isWallSliding = true;
-										CurrentJumpStrength = SlideJumpStrength;
-									}
 								}
 							}
 							if ( moveRight )
@@ -294,11 +281,6 @@ namespace CrateFighter
 									desiredPosition.X -= ( ( desiredPosition.X + playerWidth ) - obj.position.X );
 									desiredLocation.Set(desiredPosition, playerWidth, playerHeight);
 									moveRight = false;
-									if(isFalling)
-									{
-										isWallSliding = true;
-										CurrentJumpStrength = SlideJumpStrength;
-									}
 								}
 							}
 							if ( isFalling )
@@ -323,6 +305,47 @@ namespace CrateFighter
 		{
 			
 			UpdatePosition( dp );
+		}
+		
+		private void checkRange()
+		{
+			if ( EnemyList.instance != null )
+			{
+				if (facingRight ) //move the attack box  before setting it
+					attackPosition.X = ( playerPosition.X + playerWidth );	
+				else 
+					attackPosition.X = ( playerPosition.X - attackWidth );
+				
+				attackPosition.Y = playerPosition.Y; // the y possition is the same either way
+				// no point updating the collision box if there are no enemies
+				Attack.Set ( attackPosition, attackWidth, attackHeight ); //update the box collision's information up here so we only need to call it once when we call check range and we dont need to constantly update it
+				for ( int i = 0; i < EnemyList.instance.objectCounter; i++ )
+				{
+					if(EnemyList.instance.enemyObjects[i].OnScreen)
+					{
+						if(facingRight )
+						{
+							if (EnemyList.instance.enemyObjects[i].GetPosition().X > attackPosition.X  )
+							{
+								if(Attack.isColliding(EnemyList.instance.enemyObjects[i]))
+								{
+									EnemyList.instance.enemyObjects[i].MoveEnemy(100, 100);
+								}
+							}
+						}
+						else
+						{
+							if (EnemyList.instance.enemyObjects[i].GetPosition().X < playerPosition.X  )
+							{
+								if(Attack.isColliding(EnemyList.instance.enemyObjects[i]))
+								{
+									EnemyList.instance.enemyObjects[i].MoveEnemy(100, 100);
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 		
 		private void Respawn()

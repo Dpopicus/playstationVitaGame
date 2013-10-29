@@ -7,17 +7,20 @@ using Sce.PlayStation.HighLevel.GameEngine2D.Base;
 
 namespace CrateFighter
 {
-	public class Enemy
+	public class Enemy : boxCollider
 	{
 		private SpriteTile enemySprite;//Player sprite
-		private Vector2 enemyPosition;	//Players current position in the world
+		public Vector2 enemyPosition;	//Players current position in the world
 		private Vector2 enemySize;	//width and height of the player
 		
 		private float CurrentFallSpeed;
 		private float NormalMovementSpeed;
+		private int enemyWidth;
+		private int enemyHeight;
+		public int health;
 		private Vector2 PlayerPosition;
 		
-		private bool OnScreen;
+		public bool OnScreen;
 		private bool MoveLeft;
 		private bool MoveRight;
 		
@@ -33,6 +36,8 @@ namespace CrateFighter
 			PlayerPosition.Y = 100;
 			enemySize.X = 15;
 			enemySize.Y = 15;
+			enemyWidth = 15;
+			enemyHeight = 15;
 			enemySprite = Support.TiledSpriteFromFile( "Application/assets/platformPlaceholder.png",1 ,1 );
 			OnScreen = false;
 			CurrentFallSpeed = - 5.0f;
@@ -41,6 +46,7 @@ namespace CrateFighter
 			NormalMovementSpeed = 9.0f;
 			MoveLeft = false;
 			MoveRight = false;
+			health = 100;
 		}
 		
 		public Vector2 GetSize()
@@ -69,19 +75,29 @@ namespace CrateFighter
 			if (MoveLeft)
 				enemyPosition.X -= NormalMovementSpeed;
 			
+			this.Set ( enemyPosition, enemyWidth, enemyHeight);
+			
 			enemySprite.Quad.T = enemyPosition;
 			Gravity();	
+			if(health <= 0)
+			{
+				enemySprite = Support.TiledSpriteFromFile( "Application/assets/playerPlaceholder.png",1 ,1 );
+			}
 		}
 		
 		public void CheckOnScreen()
 		{
-			if (enemyPosition.X > (PlayerPosition.X - 480))
+			if (enemyPosition.X > (PlayerPosition.X - 240)) // they will only react to the player if they are withing 240 pixels of the player on either side
 			{
-				if ( enemyPosition.X < ( PlayerPosition.X + 480) )
+				if ( enemyPosition.X < ( PlayerPosition.X + 240) )
 				{
 					OnScreen = true;
 				}
+				else
+					OnScreen = false;
 			}
+			else
+				OnScreen = false;
 		}
 		
 		public void CheckEnvironmentCollisions()
@@ -146,6 +162,11 @@ namespace CrateFighter
 			{
 				--CurrentFallSpeed;
 			}
+		}
+		
+		public bool GetOnScreen()
+		{
+			return OnScreen;
 		}
 		
 	}

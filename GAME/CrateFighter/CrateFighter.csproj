@@ -31,11 +31,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Sce.PlayStation.Core" />
     <Reference Include="Sce.PlayStation.HighLevel.GameEngine2D" />
     <Reference Include="Sce.PlayStation.HighLevel.UI" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppMain.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Wall.cs" />
     <Compile Include="TerrainObjects.cs" />
     <Compile Include="BaseTerrain.cs" />
+    <Compile Include="Animation.cs" />
   </ItemGroup>
   <ItemGroup>
     <ShaderProgram Include="shaders\Simple.fcg" />
@@ -68,6 +70,7 @@
   <ItemGroup>
     <Folder Include="assets\" />
     <Folder Include="assets\sfx\" />
+    <Folder Include="assets\animations\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\crate_sideup.png" />
@@ -87,5 +90,7 @@
     <Content Include="assets\playerIdle.png" />
     <Content Include="assets\combinedImage.jpg" />
     <Content Include="assets\zombie_frames.png" />
+    <Content Include="assets\animations\playerRun.jpg" />
+    <Content Include="assets\animations\playerRun.xml" />
   </ItemGroup>
 </Project>
