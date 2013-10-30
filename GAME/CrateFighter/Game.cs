@@ -51,15 +51,12 @@ namespace CrateFighter
 		{
 			GameScene = new NoCleanupScene();
 			
-			//SplashScreen = new NoCleanupScene();	//Initialise the games menu scene
-			//Splash = Support.TiledSpriteFromFile("/Application/assets/levelStart.png", 1, 1);	//Create a sprite for the background
-			//SplashScreen.AddChild(Splash);		//Add this new sprite as a child to the menu scene
-			
-			Background = Support.TiledSpriteFromFile("/Application/assets/cathedral.jpg", 1, 1);
-			GameScene.AddChild(Background);
+			SplashScreen = new NoCleanupScene();	//Initialise the games menu scene
+			Splash = Support.TiledSpriteFromFile("/Application/assets/levelStart.png", 1, 1);	//Create a sprite for the background
+			SplashScreen.AddChild(Splash);		//Add this new sprite as a child to the menu scene
 			
 			Vector2 ideal_screen_size = new Vector2(960.0f, 544.0f);	//Set the screen resolution
-			Camera2D Splash_camera = GameScene.Camera as Camera2D;	//Create a camera for viewing the scene
+			Camera2D Splash_camera = SplashScreen.Camera as Camera2D;	//Create a camera for viewing the scene
 			Splash_camera.SetViewFromHeightAndCenter(ideal_screen_size.Y, ideal_screen_size / 2.0f);	//Position the camera in the desired position
 			
 			//GameScene = new NoCleanupScene();	//Initialise the game scene
@@ -68,7 +65,7 @@ namespace CrateFighter
 			
 			Director.Instance.Update();	//Force tick so the scene is set
 			
-			StartGame();
+			StartSplash();
 		}
 		
 		public void StartSplash()
@@ -77,7 +74,7 @@ namespace CrateFighter
 			Sce.PlayStation.HighLevel.GameEngine2D.Scheduler.Instance.Schedule(SplashScreen, TickSplash, 0.0f, false);	//Set the Splash scene as active
 			
 			//Set up a transition between the scenes
-			var transition = new TransitionSolidFade(SplashScreen) { PreviousScene = Director.Instance.CurrentScene, Duration = 1.5f, Tween = Sce.PlayStation.HighLevel.GameEngine2D.Base.Math.Linear };
+			var transition = new TransitionSolidFade(SplashScreen) { PreviousScene = Director.Instance.CurrentScene, Duration = 3.0f, Tween = Sce.PlayStation.HighLevel.GameEngine2D.Base.Math.Linear };
 			Director.Instance.ReplaceScene(transition);
 		}
 		
@@ -100,14 +97,14 @@ namespace CrateFighter
 			var transition = new TransitionSolidFade(GameScene) { PreviousScene = Director.Instance.CurrentScene, Duration = 1.5f, Tween = Sce.PlayStation.HighLevel.GameEngine2D.Base.Math.Linear };
 			Director.Instance.ReplaceScene(transition);
 			
-			Support.MusicSystem.Instance.PlayNoClobber("amazingMusic.mp3", true);	//Play some music for the first level
+			Support.MusicSystem.Instance.PlayNoClobber("Ackman.mp3", true);	//Play some music for the first level
 			
 			playerInstance = new Player();	//Create a player
 			enemyInstance = new Enemy();
 			guiTest = new GUI();
 			
 			ground = new Ground( "Application/assets/platformPlaceholder.png", 0, 0, 1000, 25 );
-			leftWall = new Wall( "Application/assets/platformPlaceholder.png", 0, 0, 50, 500 );
+			//leftWall = new Wall( "Application/assets/platformPlaceholder.png", 0, 0, 50, 500 );
 		}
 		
 		public void TickGame(float dt)

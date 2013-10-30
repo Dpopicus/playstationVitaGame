@@ -16,6 +16,12 @@ using Sce.PlayStation.Core.Input;	//used for polling for gamepad input
 
 namespace CrateFighter
 {
+	enum AnimationState
+	{
+		Idle = 1,
+		Walk = 2
+	}
+	
 	public class Player : boxCollider
 	{
 		public SoundPlayer soundPlayerBullet;
@@ -24,9 +30,6 @@ namespace CrateFighter
 		Sound jumpThreeSound;
 		Sound jumpFourSound;
 		
-		private SpriteTile currentSprite;
-		private SpriteTile playerSprite;//Player sprite
-		private SpriteTile idleSprite;
 		private Vector2 attackPosition;
 		private int attackWidth;
 		private int attackHeight;
@@ -45,7 +48,10 @@ namespace CrateFighter
 		private float NormalMovementSpeed;	//The normal walking speed for the player
 		private float SprintingMovementSpeed;
 		
-		Animation derp;
+		AnimationState CurrentAnimationState;
+		Animation CurrentAnimation;
+		Animation IdleAnimation;
+		Animation WalkAnimation;
 		
 		private bool moveLeft;
 		private bool moveRight;
@@ -54,6 +60,7 @@ namespace CrateFighter
 		
 		private BaseTerrain groundObject;
 		
+		private bool isMoving; //This is used to decide whether to use idle or running animations
 		private bool isFalling;
 		private float GravityStrength;
 		private float VerticalVelocity;
@@ -64,20 +71,44 @@ namespace CrateFighter
 		
 		public Player ()
 		{
+			//\====================================
+			//\Set up player sound effects
+			//\====================================
+			
 			jumpOneSound = new Sound("/Application/assets/sfx/jump1.wav");
 			jumpTwoSound = new Sound("/Application/assets/sfx/jump2.wav");
 			jumpThreeSound = new Sound("/Application/assets/sfx/jump3.wav");
 			jumpFourSound = new Sound("/Application/assets/sfx/jump4.wav");
 			
-			derp = new Animation();
-			derp.LoadAnimation("playerRun");
+			//\====================================
+			//\Set up player animations
+			//\====================================
+			
+			playerWidth = 46;
+			playerHeight = 109;
+			
+			IdleAnimation = new Animation();
+			IdleAnimation.LoadAnimation("catIdle");
+			IdleAnimation.Move ( playerPosition );
+			IdleAnimation.Resize( playerWidth, playerHeight );
+			
+			WalkAnimation = new Animation();
+			WalkAnimation.LoadAnimation("catWalk");
+			WalkAnimation.Move ( playerPosition );
+			WalkAnimation.Resize( playerWidth, playerHeight );
+			WalkAnimation.SetView( false );	//This animation is not used from the start, so we want to hide it from view
+			
+			CurrentAnimation = IdleAnimation;
+			CurrentAnimationState = AnimationState.Idle;
+			
+			//\====================================
+			//\Set up stuff for combat mechanics
+			//\====================================
 			
 			attackPosition = playerPosition;
 			attackWidth = 15;
 			attackHeight = 15;
 			
-			playerWidth = 46;
-			playerHeight = 109;
 			SpawnPoint = new Vector2();
 			SpawnPoint.X = 100;
 			SpawnPoint.Y = 100;
@@ -86,20 +117,6 @@ namespace CrateFighter
 			facingRight = true;
 			previousPosition = playerPosition;
 			
-			//\====================
-			//\Create player sprites
-			//\====================
-			
-			playerSprite = Support.TiledSpriteFromFile( "Application/assets/playerPlaceholder.png",1 ,1 ); // image name and the fraction of the base image that each frame will take up
-			playerSprite.Quad.S = new Vector2(playerWidth, playerHeight);
-			Game.Instance.GameScene.AddChild(playerSprite, 2);	//Add this sprite as a child to the game scene
-			playerSprite.Visible = false;
-			
-			idleSprite = Support.TiledSpriteFromFile ( "Application/assets/playerIdle.png", 1, 1 );
-			idleSprite.Quad.S = new Vector2(playerWidth, playerHeight);
-			Game.Instance.GameScene.AddChild(idleSprite, 2);
-			
-			currentSprite = idleSprite;
 			Attack = new boxCollider();
 		
 			isFalling = true;
@@ -117,34 +134,59 @@ namespace CrateFighter
 		{
 			playerPosition.X = xPos;
 			playerPosition.Y = yPos;
-			playerSprite.Quad.T = playerPosition;
+			CurrentAnimation.Move(playerPosition);
 		}
 		
 		public void Update()
 		{
-			UpdateSprite ();
-			GetInput();
+			UpdateSprite ();	//Moves the players sprite to its current position
+			GetInput();	//Gets input from the gamepad, then makes a note of what buttons have been pressed
 			this.Set ( playerPosition, playerWidth, playerHeight);//Update the players box collider information
-			CheckEnvironmentCollisions();
+			CheckEnvironmentCollisions();	//After getting input from the player, we know know where 
+			//the player is trying to move this frame, so we get as close to that position as the environment will allow.
+			CurrentAnimation.Play();	//Plays the current player animation
 		}
 		
 		public void UpdateSprite()
 		{
-			if ( previousPosition.X == playerPosition.X )
-				return;
+			isMoving = previousPosition.X != playerPosition.X ? true : false;
 			
-			facingRight = previousPosition.X > playerPosition.X ? false : true;
-			if (facingRight)
-				currentSprite.FlipU = false;
-			else
-				currentSprite.FlipU = true;
+			switch (CurrentAnimationState)
+			{//In here we change what animation state the player is in so we are 
+				//viewing the correct animations, and hiding ones that aren't being used
+			case AnimationState.Idle:
+				if (isMoving)
+				{//Enters here when we want to change to the walking animation state
+					CurrentAnimationState = AnimationState.Walk;
+					CurrentAnimation.SetView(false);	//Hide the idle animation
+					CurrentAnimation = WalkAnimation;	//Change to the walking animation
+					CurrentAnimation.SetView(true);	//Unhide this animation
+				}
+				break;
+			case AnimationState.Walk:
+				if (!isMoving)
+				{//Enters here when we want to change to the idle animation state
+					CurrentAnimationState = AnimationState.Idle;
+					CurrentAnimation.SetView(false);
+					CurrentAnimation = IdleAnimation;
+					CurrentAnimation.SetView(true);
+				}
+				break;
+			}
+			
+			if ( previousPosition.X > playerPosition.X )
+				facingRight = true;
+			if ( previousPosition.X < playerPosition.X )
+				facingRight = false;
+			
+			CurrentAnimation.FaceRight( facingRight );
 			previousPosition = playerPosition;
 		}
 		
 		public void UpdatePosition( Vector2 dp )
 		{
 			playerPosition = dp;
-			currentSprite.Quad.T = playerPosition;
+			CurrentAnimation.Move(playerPosition);
 		}
 		
 		public Vector2 GetPosition()
@@ -351,7 +393,7 @@ namespace CrateFighter
 		private void Respawn()
 		{//Sends the player back to the start of the level
 			playerPosition = SpawnPoint;
-			playerSprite.Quad.T = playerPosition;
+			CurrentAnimation.Move(playerPosition);
 			isFalling = true;
 			VerticalVelocity = 0.0f;
 		}

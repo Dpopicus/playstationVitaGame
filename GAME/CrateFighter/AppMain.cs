@@ -29,11 +29,11 @@ namespace CrateFighter
 		
 		public static void Main (string[] args)
 		{
-			//LoadMenu();
-			//while (menuActive)
-			//{
-			//	RunMenu();	
-			//}
+			LoadMenu();
+			while (menuActive)
+			{
+				RunMenu();	
+			}
 			
 			Initialize();
 			while (true) {
@@ -45,7 +45,7 @@ namespace CrateFighter
 
 		public static void Initialize ()
 		{
-			//graphics.Dispose();	//Get rid of the old graphics context that is used for the main menu
+			graphics.Dispose();	//Get rid of the old graphics context that is used for the main menu
 			//This can't run at the same time as the Director
 			
 			Director.Initialize();	//Set up the director
@@ -63,7 +63,7 @@ namespace CrateFighter
 			UISystem.Initialize(graphics);	//Start up the UI system using the graphics context
 			mainMenu = new CrateFighter.menu();	//Create a new main menu
 			UISystem.SetScene(mainMenu);	//Set the main menu as the active scene
-			Support.MusicSystem.Instance.PlayNoClobber("Saber1.mp3", true);	//Loop some music for the main menu
+			//Support.MusicSystem.Instance.PlayNoClobber("Saber1.mp3", true);	//Loop some music for the main menu
 		}
 		
 		public static void RunMenu()

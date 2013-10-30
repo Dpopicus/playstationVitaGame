@@ -78,19 +78,16 @@
     <Content Include="assets\crate_sidedown.png" />
     <Content Include="assets\Saber1.mp3" />
     <Content Include="assets\levelStart.png" />
-    <Content Include="assets\platformPlaceholder.png" />
-    <Content Include="assets\playerPlaceholder.png" />
     <Content Include="assets\guitest.png" />
-    <Content Include="assets\amazingMusic.mp3" />
-    <Content Include="assets\cathedral.jpg" />
     <Content Include="assets\sfx\jump1.wav" />
     <Content Include="assets\sfx\jump2.wav" />
     <Content Include="assets\sfx\jump3.wav" />
     <Content Include="assets\sfx\jump4.wav" />
-    <Content Include="assets\playerIdle.png" />
-    <Content Include="assets\combinedImage.jpg" />
-    <Content Include="assets\zombie_frames.png" />
-    <Content Include="assets\animations\playerRun.jpg" />
-    <Content Include="assets\animations\playerRun.xml" />
+    <Content Include="assets\animations\catWalk.jpg" />
+    <Content Include="assets\animations\catWalk.xml" />
+    <Content Include="assets\animations\catIdle.jpg" />
+    <Content Include="assets\animations\catIdle.xml" />
+    <Content Include="assets\Ackman.mp3" />
+    <Content Include="assets\platformPlaceholder.png" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,10 @@
+After you create an animation, combine it into a single sprite sheet, and save this animation in /assets/animations/
+next you need to click save and save this xml file into the same folder (IT MUST HAVE THE SAME NAME AS THE IMAGE TO WORK)
+example: (inside /assets/animations/ )  playerRun.jpg & playerRun.xml
+Now in the playstation mobile studio, right click the animations folder in the solution explorer, and click add -> add files from folder.
+Select the two files that were created from the sprite sheet tool and add them to the project.
+Now these files will appear in the solution explorer, you must right click on the xml file and go to properties.  
+A new window will appear on the right, drag this out so you can see all of the contents.  
+You need to change the build action to 'Content' otherwise the xml file will not be added to the project when you build it.  
+The playstation mobile studio automatically adds images and sound files, but with xml you have to make sure it adds them.
+Otherwise the game will run and it wont be able to find the files, and there will be problems :)
