@@ -20,8 +20,8 @@ namespace CrateFighter
 		public int health;
 		private Vector2 PlayerPosition;
 		
-		public bool ToughingRight;
-		public bool TouchngLeft;
+		public bool TouchingRight;
+		public bool TouchingLeft;
 		public bool OnScreen;
 		private bool MoveLeft;
 		private bool MoveRight;
@@ -36,12 +36,12 @@ namespace CrateFighter
 			enemyPosition.Y = 400;
 			PlayerPosition.X = 100;
 			PlayerPosition.Y = 100;
-			enemySize.X = 100;
-			enemySize.Y = 100;
-			enemyWidth = 100;
-			enemyHeight = 100;
-			TouchngLeft = false;
-			ToughingRight =false;
+			enemySize.X = 140;
+			enemySize.Y = 140;
+			enemyWidth = 140;
+			enemyHeight = 140;
+			TouchingLeft = false;
+			TouchingRight =false;
 			enemySprite = Support.TiledSpriteFromFile( "Application/assets/platformPlaceholder.png",1 ,1 );
 			OnScreen = false;
 			CurrentFallSpeed = - 5.0f;
@@ -133,14 +133,14 @@ namespace CrateFighter
 			}
 			if( OnScreen  )
 			{
-				if(!ToughingRight)
+				if(!TouchingRight)
 				{
 					if( (enemyPosition.X + enemyWidth  ) < (PlayerPosition.X))
 					{
 						MoveRight = true;
 					}
 				}
-				if(!TouchngLeft)
+				if(!TouchingLeft)
 				{
 					if( enemyPosition.X > (PlayerPosition.X + 10))
 					{

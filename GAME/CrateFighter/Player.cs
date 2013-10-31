@@ -352,13 +352,13 @@ namespace CrateFighter
 									desiredPosition.X -= ( ( desiredPosition.X + playerWidth ) - EnemyList.instance.enemyObjects[i].position.X );
 									desiredLocation.Set(desiredPosition, playerWidth, playerHeight);
 									moveRight = false;
-									EnemyList.instance.enemyObjects[i].TouchngLeft = true;
+									EnemyList.instance.enemyObjects[i].TouchingLeft = true;
 								}
 								else
-									EnemyList.instance.enemyObjects[i].TouchngLeft = false;
+									EnemyList.instance.enemyObjects[i].TouchingLeft = false;
 							}
 							else
-								EnemyList.instance.enemyObjects[i].TouchngLeft = false;
+								EnemyList.instance.enemyObjects[i].TouchingLeft = false;
 							if (EnemyList.instance.enemyObjects[i].GetPosition().X < (playerPosition.X + CurrentMovementSpeed)  )
 							{
 								if(desiredLocation.leftCollide( EnemyList.instance.enemyObjects[i] ))
@@ -366,12 +366,12 @@ namespace CrateFighter
 									desiredPosition.X += ( ( EnemyList.instance.enemyObjects[i].position.X + EnemyList.instance.enemyObjects[i].width ) - desiredLocation.position.X );
 									desiredLocation.Set(desiredPosition, playerWidth, playerHeight);
 									moveLeft = false;
-									EnemyList.instance.enemyObjects[i].ToughingRight = true;
+									EnemyList.instance.enemyObjects[i].TouchingRight = true;
 								}
-								else EnemyList.instance.enemyObjects[i].ToughingRight = false;
+								else EnemyList.instance.enemyObjects[i].TouchingRight = false;
 							}
 							else
-								EnemyList.instance.enemyObjects[i].ToughingRight = false;
+								EnemyList.instance.enemyObjects[i].TouchingRight = false;
 						}
 					}
 				}
