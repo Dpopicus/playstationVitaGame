@@ -4,9 +4,8 @@
     <Files>
       <File FileName="CrateFighter\Game.cs" Line="116" Column="17" />
       <File FileName="CrateFighter\Support.cs" Line="23" Column="2" />
-      <File FileName="CrateFighter\Player.cs" Line="32" Column="26" />
-      <File FileName="CrateFighter\Terrain.cs" Line="31" Column="115" />
-      <File FileName="CrateFighter\Enemy.cs" Line="26" Column="96" />
+      <File FileName="CrateFighter\Player.cs" Line="356" Column="10" />
+      <File FileName="CrateFighter\Enemy.cs" Line="145" Column="6" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">

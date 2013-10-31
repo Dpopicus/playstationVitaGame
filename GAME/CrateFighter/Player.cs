@@ -339,16 +339,46 @@ namespace CrateFighter
 						break;
 					}
 				}
-				CheckEnemyCollisions( desiredPosition );
+				if ( EnemyList.instance != null )
+				{
+					for ( int i = 0; i < EnemyList.instance.objectCounter; i++ )
+					{
+						if(EnemyList.instance.enemyObjects[i].OnScreen)
+						{
+							if (EnemyList.instance.enemyObjects[i].GetPosition().X > desiredPosition.X  )
+							{
+								if(desiredLocation.rightCollide(EnemyList.instance.enemyObjects[i]))
+								{
+									desiredPosition.X -= ( ( desiredPosition.X + playerWidth ) - EnemyList.instance.enemyObjects[i].position.X );
+									desiredLocation.Set(desiredPosition, playerWidth, playerHeight);
+									moveRight = false;
+									EnemyList.instance.enemyObjects[i].TouchngLeft = true;
+								}
+								else
+									EnemyList.instance.enemyObjects[i].TouchngLeft = false;
+							}
+							else
+								EnemyList.instance.enemyObjects[i].TouchngLeft = false;
+							if (EnemyList.instance.enemyObjects[i].GetPosition().X < (playerPosition.X + CurrentMovementSpeed)  )
+							{
+								if(desiredLocation.leftCollide( EnemyList.instance.enemyObjects[i] ))
+								{
+									desiredPosition.X += ( ( EnemyList.instance.enemyObjects[i].position.X + EnemyList.instance.enemyObjects[i].width ) - desiredLocation.position.X );
+									desiredLocation.Set(desiredPosition, playerWidth, playerHeight);
+									moveLeft = false;
+									EnemyList.instance.enemyObjects[i].ToughingRight = true;
+								}
+								else EnemyList.instance.enemyObjects[i].ToughingRight = false;
+							}
+							else
+								EnemyList.instance.enemyObjects[i].ToughingRight = false;
+						}
+					}
+				}
+				UpdatePosition( desiredPosition  );
 			}
 		}
-		
-		private void CheckEnemyCollisions( Vector2 dp )
-		{
-			
-			UpdatePosition( dp );
-		}
-		
+				
 		private void checkRange()
 		{
 			if ( EnemyList.instance != null )
