@@ -56,6 +56,9 @@ namespace CrateFighter
 		private bool moveLeft;
 		private bool moveRight;
 		
+		private bool healddown; //checks if attack is being heald down
+		private bool enemyHit; // checks if any of the attack collisions went through, used to avoid counting damage multiple times per hit
+		
 		private bool Jump;
 		
 		private BaseTerrain groundObject;
@@ -86,6 +89,8 @@ namespace CrateFighter
 			
 			playerWidth = 46;
 			playerHeight = 109;
+			healddown = false;
+			enemyHit = false;
 			
 			IdleAnimation = new Animation();
 			IdleAnimation.LoadAnimation("catIdle");
@@ -106,8 +111,8 @@ namespace CrateFighter
 			//\====================================
 			
 			attackPosition = playerPosition;
-			attackWidth = 15;
-			attackHeight = 15;
+			attackWidth = 35;
+			attackHeight = 35;
 			
 			SpawnPoint = new Vector2();
 			SpawnPoint.X = 100;
@@ -201,8 +206,15 @@ namespace CrateFighter
 			
 			if ( (PadData.Buttons & GamePadButtons.Circle) != 0 )
 				Respawn ();
-			if ( (PadData.Buttons & GamePadButtons.Square ) != 0 )
+			if (( (PadData.Buttons & GamePadButtons.Square ) != 0 )&& !healddown)
+			{
 				checkRange ();
+				healddown = true;
+			}
+			if (( (PadData.Buttons & GamePadButtons.Square ) == 0 )&& healddown)
+			{
+				healddown = false;
+			}
 			moveLeft = ((PadData.AnalogLeftX < 0.0f ) || ((PadData.Buttons & GamePadButtons.Left) != 0)) ? true : false;
 			moveRight = ((PadData.AnalogLeftX > 0.0f ) || ((PadData.Buttons & GamePadButtons.Right) != 0)) ? true : false;
 			CurrentMovementSpeed = ((PadData.Buttons & GamePadButtons.Square) != 0) ? SprintingMovementSpeed : NormalMovementSpeed;
@@ -384,10 +396,11 @@ namespace CrateFighter
 			if ( EnemyList.instance != null )
 			{
 				if (facingRight ) //move the attack box  before setting it
-					attackPosition.X = ( playerPosition.X + playerWidth );	
-				else 
+					attackPosition.X = ( playerPosition.X + attackWidth );	
+				if(!facingRight) 
 					attackPosition.X = ( playerPosition.X - attackWidth );
 				
+				enemyHit = false;
 				attackPosition.Y = playerPosition.Y; // the y possition is the same either way
 				// no point updating the collision box if there are no enemies
 				Attack.Set ( attackPosition, attackWidth, attackHeight ); //update the box collision's information up here so we only need to call it once when we call check range and we dont need to constantly update it
@@ -401,7 +414,15 @@ namespace CrateFighter
 							{
 								if(Attack.isColliding(EnemyList.instance.enemyObjects[i]))
 								{
-									EnemyList.instance.enemyObjects[i].MoveEnemy(100, 100);
+									enemyHit = true;
+								}
+								if(Attack.leftCollide(EnemyList.instance.enemyObjects[i]))
+								{
+									enemyHit = true;
+								}
+								if(Attack.rightCollide(EnemyList.instance.enemyObjects[i]))
+								{
+									enemyHit = true;
 								}
 							}
 						}
@@ -411,9 +432,21 @@ namespace CrateFighter
 							{
 								if(Attack.isColliding(EnemyList.instance.enemyObjects[i]))
 								{
-									EnemyList.instance.enemyObjects[i].MoveEnemy(100, 100);
+									enemyHit = true;
+								}
+								if(Attack.leftCollide(EnemyList.instance.enemyObjects[i]))
+								{
+									enemyHit = true;
+								}
+								if(Attack.rightCollide(EnemyList.instance.enemyObjects[i]))
+								{
+									enemyHit = true;
 								}
 							}
+						}
+						if (enemyHit )
+						{
+							EnemyList.instance.enemyObjects[i].health -= 50;
 						}
 					}
 				}

@@ -85,7 +85,9 @@ namespace CrateFighter
 			Gravity();	
 			if(health <= 0)
 			{
-				enemySprite = Support.TiledSpriteFromFile( "Application/assets/playerPlaceholder.png",1 ,1 );
+				enemyPosition.X = 100;
+				enemyPosition.Y = 100;
+				health = 100;
 			}
 		}
 		
