@@ -56,7 +56,7 @@ namespace CrateFighter
 		private bool moveLeft;
 		private bool moveRight;
 		
-		private bool healddown; //checks if attack is being heald down
+		private bool HealdDown; //checks if attack is being heald down
 		private bool enemyHit; // checks if any of the attack collisions went through, used to avoid counting damage multiple times per hit
 		
 		private bool Jump;
@@ -89,7 +89,7 @@ namespace CrateFighter
 			
 			playerWidth = 46;
 			playerHeight = 109;
-			healddown = false;
+			HealdDown = false;
 			enemyHit = false;
 			
 			IdleAnimation = new Animation();
@@ -206,14 +206,14 @@ namespace CrateFighter
 			
 			if ( (PadData.Buttons & GamePadButtons.Circle) != 0 )
 				Respawn ();
-			if (( (PadData.Buttons & GamePadButtons.Square ) != 0 )&& !healddown)
+			if (( (PadData.Buttons & GamePadButtons.Square ) != 0 )&& !HealdDown)
 			{
 				checkRange ();
-				healddown = true;
+				HealdDown = true;
 			}
-			if (( (PadData.Buttons & GamePadButtons.Square ) == 0 )&& healddown)
+			if (( (PadData.Buttons & GamePadButtons.Square ) == 0 )&& HealdDown)
 			{
-				healddown = false;
+				HealdDown = false;
 			}
 			moveLeft = ((PadData.AnalogLeftX < 0.0f ) || ((PadData.Buttons & GamePadButtons.Left) != 0)) ? true : false;
 			moveRight = ((PadData.AnalogLeftX > 0.0f ) || ((PadData.Buttons & GamePadButtons.Right) != 0)) ? true : false;
