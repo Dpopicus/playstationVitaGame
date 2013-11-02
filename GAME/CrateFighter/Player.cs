@@ -56,6 +56,9 @@ namespace CrateFighter
 		private bool moveLeft;
 		private bool moveRight;
 		
+		private bool HealdDown; //checks if attack is being heald down
+		private bool enemyHit; // checks if any of the attack collisions went through, used to avoid counting damage multiple times per hit
+		
 		private bool Jump;
 		
 		private BaseTerrain groundObject;
@@ -86,6 +89,8 @@ namespace CrateFighter
 			
 			playerWidth = 46;
 			playerHeight = 109;
+			HealdDown = false;
+			enemyHit = false;
 			
 			IdleAnimation = new Animation();
 			IdleAnimation.LoadAnimation("catIdle");
@@ -93,7 +98,7 @@ namespace CrateFighter
 			IdleAnimation.Resize( playerWidth, playerHeight );
 			
 			WalkAnimation = new Animation();
-			WalkAnimation.LoadAnimation("catWalk");
+			WalkAnimation.LoadAnimation("SamuraiRun");
 			WalkAnimation.Move ( playerPosition );
 			WalkAnimation.Resize( playerWidth, playerHeight );
 			WalkAnimation.SetView( false );	//This animation is not used from the start, so we want to hide it from view
@@ -106,8 +111,8 @@ namespace CrateFighter
 			//\====================================
 			
 			attackPosition = playerPosition;
-			attackWidth = 15;
-			attackHeight = 15;
+			attackWidth = 35;
+			attackHeight = 35;
 			
 			SpawnPoint = new Vector2();
 			SpawnPoint.X = 100;
@@ -201,8 +206,15 @@ namespace CrateFighter
 			
 			if ( (PadData.Buttons & GamePadButtons.Circle) != 0 )
 				Respawn ();
-			if ( (PadData.Buttons & GamePadButtons.Square ) != 0 )
+			if (( (PadData.Buttons & GamePadButtons.Square ) != 0 )&& !HealdDown)
+			{
 				checkRange ();
+				HealdDown = true;
+			}
+			if (( (PadData.Buttons & GamePadButtons.Square ) == 0 )&& HealdDown)
+			{
+				HealdDown = false;
+			}
 			moveLeft = ((PadData.AnalogLeftX < 0.0f ) || ((PadData.Buttons & GamePadButtons.Left) != 0)) ? true : false;
 			moveRight = ((PadData.AnalogLeftX > 0.0f ) || ((PadData.Buttons & GamePadButtons.Right) != 0)) ? true : false;
 			CurrentMovementSpeed = ((PadData.Buttons & GamePadButtons.Square) != 0) ? SprintingMovementSpeed : NormalMovementSpeed;
@@ -339,25 +351,56 @@ namespace CrateFighter
 						break;
 					}
 				}
-				CheckEnemyCollisions( desiredPosition );
+				if ( EnemyList.instance != null )
+				{
+					for ( int i = 0; i < EnemyList.instance.objectCounter; i++ )
+					{
+						if(EnemyList.instance.enemyObjects[i].OnScreen)
+						{
+							if (EnemyList.instance.enemyObjects[i].GetPosition().X > desiredPosition.X  )
+							{
+								if(desiredLocation.rightCollide(EnemyList.instance.enemyObjects[i]))
+								{
+									desiredPosition.X -= ( ( desiredPosition.X + playerWidth ) - EnemyList.instance.enemyObjects[i].position.X );
+									desiredLocation.Set(desiredPosition, playerWidth, playerHeight);
+									moveRight = false;
+									EnemyList.instance.enemyObjects[i].TouchingLeft = true;
+								}
+								else
+									EnemyList.instance.enemyObjects[i].TouchingLeft = false;
+							}
+							else
+								EnemyList.instance.enemyObjects[i].TouchingLeft = false;
+							if (EnemyList.instance.enemyObjects[i].GetPosition().X < (playerPosition.X + CurrentMovementSpeed)  )
+							{
+								if(desiredLocation.leftCollide( EnemyList.instance.enemyObjects[i] ))
+								{
+									desiredPosition.X += ( ( EnemyList.instance.enemyObjects[i].position.X + EnemyList.instance.enemyObjects[i].width ) - desiredLocation.position.X );
+									desiredLocation.Set(desiredPosition, playerWidth, playerHeight);
+									moveLeft = false;
+									EnemyList.instance.enemyObjects[i].TouchingRight = true;
+								}
+								else EnemyList.instance.enemyObjects[i].TouchingRight = false;
+							}
+							else
+								EnemyList.instance.enemyObjects[i].TouchingRight = false;
+						}
+					}
+				}
+				UpdatePosition( desiredPosition  );
 			}
 		}
-		
-		private void CheckEnemyCollisions( Vector2 dp )
-		{
-			
-			UpdatePosition( dp );
-		}
-		
+				
 		private void checkRange()
 		{
 			if ( EnemyList.instance != null )
 			{
 				if (facingRight ) //move the attack box  before setting it
-					attackPosition.X = ( playerPosition.X + playerWidth );	
-				else 
+					attackPosition.X = ( playerPosition.X + attackWidth );	
+				if(!facingRight) 
 					attackPosition.X = ( playerPosition.X - attackWidth );
 				
+				enemyHit = false;
 				attackPosition.Y = playerPosition.Y; // the y possition is the same either way
 				// no point updating the collision box if there are no enemies
 				Attack.Set ( attackPosition, attackWidth, attackHeight ); //update the box collision's information up here so we only need to call it once when we call check range and we dont need to constantly update it
@@ -371,7 +414,15 @@ namespace CrateFighter
 							{
 								if(Attack.isColliding(EnemyList.instance.enemyObjects[i]))
 								{
-									EnemyList.instance.enemyObjects[i].MoveEnemy(100, 100);
+									enemyHit = true;
+								}
+								if(Attack.leftCollide(EnemyList.instance.enemyObjects[i]))
+								{
+									enemyHit = true;
+								}
+								if(Attack.rightCollide(EnemyList.instance.enemyObjects[i]))
+								{
+									enemyHit = true;
 								}
 							}
 						}
@@ -381,9 +432,21 @@ namespace CrateFighter
 							{
 								if(Attack.isColliding(EnemyList.instance.enemyObjects[i]))
 								{
-									EnemyList.instance.enemyObjects[i].MoveEnemy(100, 100);
+									enemyHit = true;
+								}
+								if(Attack.leftCollide(EnemyList.instance.enemyObjects[i]))
+								{
+									enemyHit = true;
+								}
+								if(Attack.rightCollide(EnemyList.instance.enemyObjects[i]))
+								{
+									enemyHit = true;
 								}
 							}
+						}
+						if (enemyHit )
+						{
+							EnemyList.instance.enemyObjects[i].health -= 50;
 						}
 					}
 				}

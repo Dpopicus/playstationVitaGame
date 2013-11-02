@@ -89,5 +89,8 @@
     <Content Include="assets\animations\catIdle.xml" />
     <Content Include="assets\Ackman.mp3" />
     <Content Include="assets\platformPlaceholder.png" />
+    <Content Include="assets\playerSprites2.png" />
+    <Content Include="assets\animations\SamuraiRun.jpg" />
+    <Content Include="assets\animations\SamuraiRun.xml" />
   </ItemGroup>
 </Project>

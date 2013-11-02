@@ -20,6 +20,8 @@ namespace CrateFighter
 		public int health;
 		private Vector2 PlayerPosition;
 		
+		public bool TouchingRight;
+		public bool TouchingLeft;
 		public bool OnScreen;
 		private bool MoveLeft;
 		private bool MoveRight;
@@ -34,10 +36,12 @@ namespace CrateFighter
 			enemyPosition.Y = 400;
 			PlayerPosition.X = 100;
 			PlayerPosition.Y = 100;
-			enemySize.X = 15;
-			enemySize.Y = 15;
-			enemyWidth = 15;
-			enemyHeight = 15;
+			enemySize.X = 140;
+			enemySize.Y = 140;
+			enemyWidth = 140;
+			enemyHeight = 140;
+			TouchingLeft = false;
+			TouchingRight =false;
 			enemySprite = Support.TiledSpriteFromFile( "Application/assets/platformPlaceholder.png",1 ,1 );
 			OnScreen = false;
 			CurrentFallSpeed = - 5.0f;
@@ -81,13 +85,15 @@ namespace CrateFighter
 			Gravity();	
 			if(health <= 0)
 			{
-				enemySprite = Support.TiledSpriteFromFile( "Application/assets/playerPlaceholder.png",1 ,1 );
+				enemyPosition.X = 100;
+				enemyPosition.Y = 100;
+				health = 100;
 			}
 		}
 		
 		public void CheckOnScreen()
 		{
-			if (enemyPosition.X > (PlayerPosition.X - 240)) // they will only react to the player if they are withing 240 pixels of the player on either side
+			if (( enemyPosition.X + enemyWidth ) > (PlayerPosition.X - 240)) // they will only react to the player if they are withing 240 pixels of the player on either side
 			{
 				if ( enemyPosition.X < ( PlayerPosition.X + 240) )
 				{
@@ -129,13 +135,19 @@ namespace CrateFighter
 			}
 			if( OnScreen  )
 			{
-				if( enemyPosition.X < PlayerPosition.X)
+				if(!TouchingRight)
 				{
-					MoveRight = true;
+					if( (enemyPosition.X + enemyWidth  ) < (PlayerPosition.X))
+					{
+						MoveRight = true;
+					}
 				}
-				else if( enemyPosition.X > PlayerPosition.X)
+				if(!TouchingLeft)
 				{
-					MoveLeft = true;
+					if( enemyPosition.X > (PlayerPosition.X + 10))
+					{
+						MoveLeft = true;
+					}
 				}
 			}
 			UpdatePosition();
