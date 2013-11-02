@@ -1,12 +1,12 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="c:\Users\Dpop\Documents\GitHub\playstationVitaGame\GAME\CrateFighter\Animation.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CrateFighter\Player.cs">
     <Files>
       <File FileName="CrateFighter\Game.cs" Line="116" Column="17" />
       <File FileName="CrateFighter\Support.cs" Line="127" Column="42" />
       <File FileName="CrateFighter\Enemy.cs" Line="90" Column="18" />
-      <File FileName="CrateFighter\Player.cs" Line="101" Column="38" />
-      <File FileName="c:\Users\Dpop\Documents\GitHub\playstationVitaGame\GAME\CrateFighter\Animation.cs" Line="90" Column="1" />
+      <File FileName="CrateFighter\Player.cs" Line="101" Column="43" />
+      <File FileName="c:\Users\Dpop\Documents\GitHub\playstationVitaGame\GAME\CrateFighter\Animation.cs" Line="66" Column="28" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">

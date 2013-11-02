@@ -98,7 +98,7 @@ namespace CrateFighter
 			IdleAnimation.Resize( playerWidth, playerHeight );
 			
 			WalkAnimation = new Animation();
-			WalkAnimation.LoadAnimation("catWalk");
+			WalkAnimation.LoadAnimation("SamuraiRun");
 			WalkAnimation.Move ( playerPosition );
 			WalkAnimation.Resize( playerWidth, playerHeight );
 			WalkAnimation.SetView( false );	//This animation is not used from the start, so we want to hide it from view

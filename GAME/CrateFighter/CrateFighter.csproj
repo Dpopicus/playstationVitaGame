@@ -91,8 +91,6 @@
     <Content Include="assets\platformPlaceholder.png" />
     <Content Include="assets\playerSprites2.png" />
     <Content Include="assets\animations\SamuraiRun.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="assets\animations\SamuraiRun.xml" />
+    <Content Include="assets\animations\SamuraiRun.xml" />
   </ItemGroup>
 </Project>
