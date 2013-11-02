@@ -29,11 +29,13 @@ namespace CrateFighter
 		
 		public static void Main (string[] args)
 		{
+			/*Uncomment this to make the main menu work, also read comment on line 50
 			LoadMenu();
 			while (menuActive)
 			{
 				RunMenu();	
 			}
+			*/
 			
 			Initialize();
 			while (true) {
@@ -45,7 +47,8 @@ namespace CrateFighter
 
 		public static void Initialize ()
 		{
-			graphics.Dispose();	//Get rid of the old graphics context that is used for the main menu
+			//uncomment the next line for main menu
+			//graphics.Dispose();	//Get rid of the old graphics context that is used for the main menu
 			//This can't run at the same time as the Director
 			
 			Director.Initialize();	//Set up the director

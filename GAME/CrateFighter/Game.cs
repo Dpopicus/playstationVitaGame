@@ -26,7 +26,8 @@ namespace CrateFighter
 		public NoCleanupScene SplashScreen;	//The level begin splash screen
 		public NoCleanupScene GameScene;	//The first game scene for testing gameplay
 		
-		public SpriteTile Splash;	//This is a sprite used as the background of the main menu
+		//uncomment next line to put back in level start splash screen, then go to line 55
+		//public SpriteTile Splash;	//This is a sprite used as the background of the main menu
 		public SpriteTile Background; //The background image for the testing level
 		
 		public GUI guiTest;	//Test for drawing player HUD / GUI
@@ -51,12 +52,15 @@ namespace CrateFighter
 		{
 			GameScene = new NoCleanupScene();
 			
-			SplashScreen = new NoCleanupScene();	//Initialise the games menu scene
-			Splash = Support.TiledSpriteFromFile("/Application/assets/levelStart.png", 1, 1);	//Create a sprite for the background
-			SplashScreen.AddChild(Splash);		//Add this new sprite as a child to the menu scene
+			//To put back splash screen, uncomment next 3 lines, read line 62
+			//SplashScreen = new NoCleanupScene();	//Initialise the games menu scene
+			//Splash = Support.TiledSpriteFromFile("/Application/assets/levelStart.png", 1, 1);	//Create a sprite for the background
+			//SplashScreen.AddChild(Splash);		//Add this new sprite as a child to the menu scene
 			
 			Vector2 ideal_screen_size = new Vector2(960.0f, 544.0f);	//Set the screen resolution
-			Camera2D Splash_camera = SplashScreen.Camera as Camera2D;	//Create a camera for viewing the scene
+			
+			//Change GameScene.Camera on next line to SplashScreen.Camera, then read like 73
+			Camera2D Splash_camera = GameScene.Camera as Camera2D;	//Create a camera for viewing the scene
 			Splash_camera.SetViewFromHeightAndCenter(ideal_screen_size.Y, ideal_screen_size / 2.0f);	//Position the camera in the desired position
 			
 			//GameScene = new NoCleanupScene();	//Initialise the game scene
@@ -65,7 +69,9 @@ namespace CrateFighter
 			
 			Director.Instance.Update();	//Force tick so the scene is set
 			
-			StartSplash();
+			
+			//Change next line to StartSplash(); to put back splash screen, and thats it :)
+			StartGame();
 		}
 		
 		public void StartSplash()

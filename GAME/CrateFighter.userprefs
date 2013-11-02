@@ -2,20 +2,19 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="CrateFighter\Player.cs">
     <Files>
-      <File FileName="CrateFighter\Game.cs" Line="116" Column="17" />
+      <File FileName="CrateFighter\Game.cs" Line="73" Column="82" />
       <File FileName="CrateFighter\Support.cs" Line="127" Column="42" />
       <File FileName="CrateFighter\Enemy.cs" Line="90" Column="18" />
-      <File FileName="CrateFighter\Player.cs" Line="101" Column="43" />
-      <File FileName="c:\Users\Dpop\Documents\GitHub\playstationVitaGame\GAME\CrateFighter\Animation.cs" Line="66" Column="28" />
+      <File FileName="CrateFighter\Player.cs" Line="211" Column="15" />
+      <File FileName="CrateFighter\AppMain.cs" Line="50" Column="43" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="CrateFighter" expanded="True">
+          <Node name="CrateFighter" expanded="True" selected="True">
             <Node name="assets" expanded="True">
               <Node name="animations" expanded="True" />
             </Node>
-            <Node name="Animation.cs" selected="True" />
           </Node>
         </State>
       </Pad>

@@ -36,7 +36,7 @@ namespace CrateFighter
 		
 		private boxCollider Attack;
 		
-		private bool facingRight; //This is used to determine whether or not to flip the player sprites
+		private bool lastDirection;	//True is last direction player tried to move is left, false if right
 		private Vector2 previousPosition; //Compares current position with previous position to see which
 											//direction the player is moving
 		private Vector2 playerPosition;	//Players current position in the world
@@ -56,7 +56,7 @@ namespace CrateFighter
 		private bool moveLeft;
 		private bool moveRight;
 		
-		private bool HealdDown; //checks if attack is being heald down
+		private bool HealdDown; //checks if attack is being heald down (dan wtf is heald) you dont know how to spell held? -_-
 		private bool enemyHit; // checks if any of the attack collisions went through, used to avoid counting damage multiple times per hit
 		
 		private bool Jump;
@@ -91,12 +91,15 @@ namespace CrateFighter
 			playerHeight = 109;
 			HealdDown = false;
 			enemyHit = false;
+			lastDirection = true;	//Set last direction to facing left
 			
+			//Player idle animation
 			IdleAnimation = new Animation();
 			IdleAnimation.LoadAnimation("catIdle");
 			IdleAnimation.Move ( playerPosition );
 			IdleAnimation.Resize( playerWidth, playerHeight );
 			
+			//Player run animation
 			WalkAnimation = new Animation();
 			WalkAnimation.LoadAnimation("SamuraiRun");
 			WalkAnimation.Move ( playerPosition );
@@ -115,11 +118,10 @@ namespace CrateFighter
 			attackHeight = 35;
 			
 			SpawnPoint = new Vector2();
-			SpawnPoint.X = 100;
+			SpawnPoint.X = 100;//This will be read in from the level data later on
 			SpawnPoint.Y = 100;
 			playerPosition.X = SpawnPoint.X;	//Set the players initial x position
 			playerPosition.Y = SpawnPoint.Y;	//Set the players initial y position
-			facingRight = true;
 			previousPosition = playerPosition;
 			
 			Attack = new boxCollider();
@@ -130,7 +132,7 @@ namespace CrateFighter
 			CurrentMovementSpeed = NormalMovementSpeed;
 			VerticalVelocity = 0.0f;
 			MaxFallingSpeed = 15.0f;
-			JumpStrength = 50.0f;
+			JumpStrength = 120.0f;	//How much the players vertical velocity is changed when it jumps
 			GravityStrength = 2.0f;
 			
 		}
@@ -179,12 +181,7 @@ namespace CrateFighter
 				break;
 			}
 			
-			if ( previousPosition.X > playerPosition.X )
-				facingRight = true;
-			if ( previousPosition.X < playerPosition.X )
-				facingRight = false;
-			
-			CurrentAnimation.FaceRight( facingRight );
+			CurrentAnimation.FaceRight( lastDirection );
 			previousPosition = playerPosition;
 		}
 		
@@ -205,25 +202,31 @@ namespace CrateFighter
 			PadData = GamePad.GetData (0);	//Update the gamepad input
 			
 			if ( (PadData.Buttons & GamePadButtons.Circle) != 0 )
-				Respawn ();
-			if (( (PadData.Buttons & GamePadButtons.Square ) != 0 )&& !HealdDown)
-			{
-				checkRange ();
-				HealdDown = true;
-			}
-			if (( (PadData.Buttons & GamePadButtons.Square ) == 0 )&& HealdDown)
-			{
-				HealdDown = false;
-			}
+				Respawn ();//Send the player back to spawn in pressed circle
+			
+			//Set flags to say the player is trying to move left or right this frame
 			moveLeft = ((PadData.AnalogLeftX < 0.0f ) || ((PadData.Buttons & GamePadButtons.Left) != 0)) ? true : false;
 			moveRight = ((PadData.AnalogLeftX > 0.0f ) || ((PadData.Buttons & GamePadButtons.Right) != 0)) ? true : false;
+			
+			//Keep track of the last direction the player tried to move, for sprite orientation
+			if (moveLeft)
+				lastDirection = true;
+			if (moveRight)
+				lastDirection = false;
+			
+			//Sprite in holding down square
 			CurrentMovementSpeed = ((PadData.Buttons & GamePadButtons.Square) != 0) ? SprintingMovementSpeed : NormalMovementSpeed;
+			
+			//If the player isn't already in the air, check for jump
 			if ( !isFalling )
 				Jump = ((PadData.Buttons & GamePadButtons.Cross) != 0) ? true : false;
 		}
 		
 		private void CheckEnvironmentCollisions()
-		{
+		{//After player input has been detected for this frame, we create a temporary
+			//box collider, and try to move it to where the player wants to go.
+			//Wont go through terrain or enemies, but will get as close as possible
+			//to where the player wants to be, based on their input.
 			List<BaseTerrain> terrainList = TerrainObjects.Instance.GetObjectList();
 			if ( terrainList.Count > 0 )
 			{
@@ -245,7 +248,9 @@ namespace CrateFighter
 					Jump = false;
 					var r = new Random();
 					switch(r.Next (4))
-					{
+					{//When the player jumps, we want to play a sound effect
+						//There a 4 different jump sound effects, and a random 
+						//one is played each time
 					case 0:
 						soundPlayerBullet = jumpOneSound.CreatePlayer();
 						soundPlayerBullet.Volume = .3f;
@@ -277,9 +282,11 @@ namespace CrateFighter
 				desiredLocation.Set( desiredPosition, playerWidth, playerHeight );
 				
 				foreach ( BaseTerrain obj in terrainList )
-				{
+				{//Loop through all the terrain objects in the level, and check collision
+					//with them
 					switch(obj.GetTerrainType())
-					{
+					{//Different objects have different ways to check for collisions (walls and floor are different for example)
+						//so we use a switch statement to use the right calculations for the corresponding terrain object
 						case TerrainType.Ground:
 						{
 							if ( isFalling )
@@ -351,53 +358,63 @@ namespace CrateFighter
 						break;
 					}
 				}
-				if ( EnemyList.instance != null )
+				//After we have finished doing environment collisions
+				//we want to pass on the value that the player should be
+				//able to move to, and check this against enemies in the world
+				CheckEnemyCollisions(desiredPosition, desiredLocation);
+			}
+		}
+		
+		private void CheckEnemyCollisions( Vector2 a_v2DesiredPosition, boxCollider a_bcDesiredLocation )
+		{
+			if ( EnemyList.instance != null )
+			{
+				for ( int i = 0; i < EnemyList.instance.objectCounter; i++ )
 				{
-					for ( int i = 0; i < EnemyList.instance.objectCounter; i++ )
+					if(EnemyList.instance.enemyObjects[i].OnScreen)
 					{
-						if(EnemyList.instance.enemyObjects[i].OnScreen)
+						if (EnemyList.instance.enemyObjects[i].GetPosition().X > a_v2DesiredPosition.X  )
 						{
-							if (EnemyList.instance.enemyObjects[i].GetPosition().X > desiredPosition.X  )
+							if(a_bcDesiredLocation.rightCollide(EnemyList.instance.enemyObjects[i]))
 							{
-								if(desiredLocation.rightCollide(EnemyList.instance.enemyObjects[i]))
-								{
-									desiredPosition.X -= ( ( desiredPosition.X + playerWidth ) - EnemyList.instance.enemyObjects[i].position.X );
-									desiredLocation.Set(desiredPosition, playerWidth, playerHeight);
-									moveRight = false;
-									EnemyList.instance.enemyObjects[i].TouchingLeft = true;
-								}
-								else
-									EnemyList.instance.enemyObjects[i].TouchingLeft = false;
+								a_v2DesiredPosition.X -= ( ( a_v2DesiredPosition.X + playerWidth ) - EnemyList.instance.enemyObjects[i].position.X );
+								a_bcDesiredLocation.Set(a_v2DesiredPosition, playerWidth, playerHeight);
+								moveRight = false;
+								EnemyList.instance.enemyObjects[i].TouchingLeft = true;
 							}
 							else
 								EnemyList.instance.enemyObjects[i].TouchingLeft = false;
-							if (EnemyList.instance.enemyObjects[i].GetPosition().X < (playerPosition.X + CurrentMovementSpeed)  )
-							{
-								if(desiredLocation.leftCollide( EnemyList.instance.enemyObjects[i] ))
-								{
-									desiredPosition.X += ( ( EnemyList.instance.enemyObjects[i].position.X + EnemyList.instance.enemyObjects[i].width ) - desiredLocation.position.X );
-									desiredLocation.Set(desiredPosition, playerWidth, playerHeight);
-									moveLeft = false;
-									EnemyList.instance.enemyObjects[i].TouchingRight = true;
-								}
-								else EnemyList.instance.enemyObjects[i].TouchingRight = false;
-							}
-							else
-								EnemyList.instance.enemyObjects[i].TouchingRight = false;
 						}
+						else
+							EnemyList.instance.enemyObjects[i].TouchingLeft = false;
+						if (EnemyList.instance.enemyObjects[i].GetPosition().X < (playerPosition.X + CurrentMovementSpeed)  )
+						{
+							if(a_bcDesiredLocation.leftCollide( EnemyList.instance.enemyObjects[i] ))
+							{
+								a_v2DesiredPosition.X += ( ( EnemyList.instance.enemyObjects[i].position.X + EnemyList.instance.enemyObjects[i].width ) - a_bcDesiredLocation.position.X );
+								a_bcDesiredLocation.Set(a_v2DesiredPosition, playerWidth, playerHeight);
+								moveLeft = false;
+								EnemyList.instance.enemyObjects[i].TouchingRight = true;
+							}
+							else EnemyList.instance.enemyObjects[i].TouchingRight = false;
+						}
+						else
+							EnemyList.instance.enemyObjects[i].TouchingRight = false;
 					}
 				}
-				UpdatePosition( desiredPosition  );
 			}
+			//Now we are finished enemy collisions, we pass the date on to move the player 
+			//to where they should be, able update sprites etc
+			UpdatePosition(a_v2DesiredPosition);
 		}
 				
 		private void checkRange()
 		{
 			if ( EnemyList.instance != null )
 			{
-				if (facingRight ) //move the attack box  before setting it
+				if (!lastDirection ) //move the attack box  before setting it
 					attackPosition.X = ( playerPosition.X + attackWidth );	
-				if(!facingRight) 
+				if(lastDirection) 
 					attackPosition.X = ( playerPosition.X - attackWidth );
 				
 				enemyHit = false;
@@ -408,7 +425,7 @@ namespace CrateFighter
 				{
 					if(EnemyList.instance.enemyObjects[i].OnScreen)
 					{
-						if(facingRight )
+						if(!lastDirection )
 						{
 							if (EnemyList.instance.enemyObjects[i].GetPosition().X > attackPosition.X  )
 							{
