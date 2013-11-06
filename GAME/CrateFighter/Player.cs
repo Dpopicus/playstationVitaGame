@@ -95,7 +95,7 @@ namespace CrateFighter
 			
 			//Player idle animation
 			IdleAnimation = new Animation();
-			IdleAnimation.LoadAnimation("fuckDan");
+			IdleAnimation.LoadAnimation("catIdle");
 			IdleAnimation.Move ( playerPosition );
 			IdleAnimation.Resize( playerWidth, playerHeight );
 			

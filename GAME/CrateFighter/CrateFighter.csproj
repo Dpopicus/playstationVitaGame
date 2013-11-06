@@ -99,7 +99,9 @@
     <Content Include="assets\levels\brick-moss-subsea.jpg" />
     <Content Include="assets\levels\brick-subsea.jpg" />
     <Content Include="assets\levels\levelOne.xml" />
-    <Content Include="assets\animations\fuckDan.jpg" />
-    <Content Include="assets\animations\fuckDan.xml" />
+    <Content Include="assets\animations\CatKick.jpg" />
+    <Content Include="assets\animations\CatStunned.jpg" />
+    <Content Include="assets\animations\CatKick.xml" />
+    <Content Include="assets\animations\CatStunned.xml" />
   </ItemGroup>
 </Project>

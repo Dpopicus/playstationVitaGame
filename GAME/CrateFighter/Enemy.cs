@@ -7,11 +7,19 @@ using Sce.PlayStation.HighLevel.GameEngine2D.Base;
 
 namespace CrateFighter
 {
+	enum BehavioralState
+	{
+		state_Follow = 1,// when the enemy sees the player and moves towards them
+		state_Patrol = 2,
+		state_Attack = 3,
+		state_Stunned = 4
+	};
 	public class Enemy : boxCollider
 	{
-		private SpriteTile enemySprite;//Player sprite
 		public Vector2 enemyPosition;	//Players current position in the world
 		private Vector2 enemySize;	//width and height of the player
+		
+		//private Vector2 previousPosition;
 		
 		private float CurrentFallSpeed;
 		private float NormalMovementSpeed;
@@ -19,6 +27,17 @@ namespace CrateFighter
 		private int enemyHeight;
 		public int health;
 		private Vector2 PlayerPosition;
+		
+		private bool facingRight;
+		
+		Animation CurrentAnimation;
+		Animation IdleAnimation;
+		Animation WalkAnimation;
+		Animation KickAnimation;
+		Animation StunnedAnimation;
+		
+		BehavioralState CurrentBehavioralState;
+		
 		
 		public bool TouchingRight;
 		public bool TouchingLeft;
@@ -42,15 +61,42 @@ namespace CrateFighter
 			enemyHeight = 140;
 			TouchingLeft = false;
 			TouchingRight =false;
-			enemySprite = Support.TiledSpriteFromFile( "Application/assets/platformPlaceholder.png",1 ,1 );
 			OnScreen = false;
 			CurrentFallSpeed = - 5.0f;
-			Game.Instance.GameScene.AddChild(enemySprite, 2);
 			EnemyList.instance.AddEnemyObject(this);
 			NormalMovementSpeed = 9.0f;
 			MoveLeft = false;
 			MoveRight = false;
 			health = 100;
+			facingRight = false;
+			
+			//previousPosition = enemyPosition;
+			
+			IdleAnimation = new Animation();
+			IdleAnimation.LoadAnimation("catIdle");
+			IdleAnimation.Move ( enemyPosition );
+			IdleAnimation.Resize( enemyWidth, enemyHeight );
+			
+			WalkAnimation = new Animation();
+			WalkAnimation.LoadAnimation("SamuraiRun");
+			WalkAnimation.Move ( enemyPosition );
+			WalkAnimation.Resize( enemyWidth, enemyHeight );
+			WalkAnimation.SetView( false );
+			
+			KickAnimation = new Animation();
+			KickAnimation.LoadAnimation("CatKick");
+			KickAnimation.Move ( enemyPosition );
+			KickAnimation.Resize( enemyWidth, enemyHeight );
+			KickAnimation.SetView( false );
+			
+			StunnedAnimation = new Animation();
+			StunnedAnimation.LoadAnimation("CatStunned");
+			StunnedAnimation.Move ( enemyPosition );
+			StunnedAnimation.Resize( enemyWidth, enemyHeight );
+			StunnedAnimation.SetView( false );
+			
+			CurrentAnimation = IdleAnimation;
+			CurrentBehavioralState = BehavioralState.state_Patrol;
 		}
 		
 		public Vector2 GetSize()
@@ -67,7 +113,7 @@ namespace CrateFighter
 		{
 			enemyPosition.X = xPos;
 			enemyPosition.Y = yPos;
-			enemySprite.Quad.T = enemyPosition;
+			CurrentAnimation.Move(enemyPosition);
 		}
 		
 		public void UpdatePosition()
@@ -81,7 +127,7 @@ namespace CrateFighter
 			
 			this.Set ( enemyPosition, enemyWidth, enemyHeight);
 			
-			enemySprite.Quad.T = enemyPosition;
+			CurrentAnimation.Move(enemyPosition);
 			Gravity();	
 			if(health <= 0)
 			{
@@ -140,12 +186,14 @@ namespace CrateFighter
 					if( (enemyPosition.X + enemyWidth  ) < (PlayerPosition.X))
 					{
 						MoveRight = true;
+						facingRight = false;
 					}
 				}
 				if(!TouchingLeft)
 				{
 					if( enemyPosition.X > (PlayerPosition.X + 10))
 					{
+						facingRight = true;
 						MoveLeft = true;
 					}
 				}
@@ -159,6 +207,90 @@ namespace CrateFighter
 			MoveRight = false;
 			MoveLeft = false;
 			CheckOnScreen();
+			switch(CurrentBehavioralState) //sets the behavior and the animation for the enemy
+			{
+			case BehavioralState.state_Patrol:
+				if(!OnScreen)
+				{
+					CurrentAnimation.SetView(false);
+					CurrentAnimation = IdleAnimation;
+					CurrentAnimation.SetView(true);
+				}
+				if(OnScreen)
+				{
+					CurrentBehavioralState = BehavioralState.state_Follow;
+				}
+				break;
+			case BehavioralState.state_Follow:
+				if(!OnScreen )
+				{
+					CurrentBehavioralState = BehavioralState.state_Patrol;
+				}
+				if(OnScreen)
+				{
+					//general follow code
+					CurrentAnimation.SetView(false);
+					CurrentAnimation = WalkAnimation;
+					CurrentAnimation.SetView(true);
+					if(TouchingLeft)
+					{
+						CurrentBehavioralState = BehavioralState.state_Attack;
+					}
+					if(TouchingRight)
+					{
+						CurrentBehavioralState = BehavioralState.state_Attack;
+					}
+					if (health == 50)
+					{
+						CurrentBehavioralState = BehavioralState.state_Stunned;
+					}
+				}
+				break;
+			case BehavioralState.state_Attack:
+				/*if(TouchingLeft )
+				{
+					CurrentAnimation.SetView(false);
+					CurrentAnimation = KickAnimation;
+					CurrentAnimation.SetView(true);
+				}
+				if(TouchingRight )
+				{
+					CurrentAnimation.SetView(false);
+					CurrentAnimation = KickAnimation;
+					CurrentAnimation.SetView(true);
+				}*/
+				if(OnScreen )
+				{
+					//if moveright = true faceright
+					CurrentAnimation.SetView(false);
+					CurrentAnimation = KickAnimation;
+					CurrentAnimation.SetView(true);
+					if (health == 50)
+					{
+						CurrentBehavioralState = BehavioralState.state_Stunned;
+					}
+				}
+				
+				else
+				{
+					CurrentBehavioralState = BehavioralState.state_Follow;
+				}
+			break;
+			case BehavioralState.state_Stunned:
+				if (health == 50)
+				{
+					CurrentAnimation.SetView(false);
+					CurrentAnimation = StunnedAnimation;
+					CurrentAnimation.SetView(true);	
+				}
+				else
+				{
+					CurrentBehavioralState = BehavioralState.state_Patrol;
+				}
+			break;
+			}			
+			CurrentAnimation.FaceRight( facingRight );
+			CurrentAnimation.Play();
 			CheckEnvironmentCollisions();
 		}
 		

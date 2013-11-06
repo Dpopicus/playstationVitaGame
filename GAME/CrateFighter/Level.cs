@@ -20,6 +20,7 @@ namespace CrateFighter
 {
 	public class Level
 	{
+		/*
 		//Level start and end
 		private Vector2 spawnPosition;
 		private boxCollider levelFinish;	//When the player collides with this box, the level is complete
@@ -49,14 +50,14 @@ namespace CrateFighter
 				fileStream.Close ();
 				XDocument doc = XDocument.Parse (xml);
 				
-				tileSize = int.Parse (doc.map.Attribute("tileheight").Value);//Read in the size of tiles
-				levelSize = new Vector2( ( int.Parse (doc.map.Attribute("width").Value)), (int.Parse (doc.map.Attribute("height").Value)));//Read in the size of the levels
+				//tileSize = int.Parse (doc.map.Attribute("tileheight").Value);//Read in the size of tiles
+				//levelSize = new Vector2( ( int.Parse (doc.map.Attribute("width").Value)), (int.Parse (doc.map.Attribute("height").Value)));//Read in the size of the levels
 				
 				foreach ( var tileSet in doc.Root.Elements("tileset"))
 				{//Loop through and read the information about the tiles that are used in this level
 					
-					int firstGid = float.Parse (tileSet.Attribute("firstgid").Value);//read in the tile ID
-					string imageName = tileSet.Attribute("name").Value;	//Get the name of the image used for this sprite
+				//	int firstGid = float.Parse (tileSet.Attribute("firstgid").Value);//read in the tile ID
+				//	string imageName = tileSet.Attribute("name").Value;	//Get the name of the image used for this sprite
 					
 					
 				}
@@ -72,6 +73,7 @@ namespace CrateFighter
 				break;
 			}
 		}
+		*/
 	}
 }
 
