@@ -119,6 +119,7 @@ namespace CrateFighter
 			//the first frame in the animation
 			image.UV.T = frames[0].UVMin;
 			image.UV.S = frames[0].UVMax;
+			image.UV.S.Y = 1.0f;
 			currentFrame = 1;	//Make a note of what frame of the animation we are on
 			image.Quad.S = new Vector2(100, 100);//This is the size of the sprite
 			

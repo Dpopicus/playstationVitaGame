@@ -1,20 +1,21 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CrateFighter\Player.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CrateFighter\Animation.cs">
     <Files>
-      <File FileName="CrateFighter\Game.cs" Line="73" Column="82" />
-      <File FileName="CrateFighter\Support.cs" Line="127" Column="42" />
-      <File FileName="CrateFighter\Enemy.cs" Line="90" Column="18" />
-      <File FileName="CrateFighter\Player.cs" Line="211" Column="15" />
-      <File FileName="CrateFighter\AppMain.cs" Line="50" Column="43" />
+      <File FileName="CrateFighter\Animation.cs" Line="99" Column="34" />
+      <File FileName="CrateFighter\Level.cs" Line="52" Column="39" />
+      <File FileName="CrateFighter\Tile.cs" Line="24" Column="39" />
+      <File FileName="CrateFighter\TerrainObjects.cs" Line="21" Column="10" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="CrateFighter" expanded="True" selected="True">
+          <Node name="CrateFighter" expanded="True">
             <Node name="assets" expanded="True">
-              <Node name="animations" expanded="True" />
+              <Node name="levels" expanded="True" />
+              <Node name="sfx" expanded="True" />
             </Node>
+            <Node name="Animation.cs" selected="True" />
           </Node>
         </State>
       </Pad>
