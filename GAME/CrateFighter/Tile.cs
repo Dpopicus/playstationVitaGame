@@ -18,12 +18,25 @@ namespace CrateFighter
 {
 	public class Tile
 	{
-		private SpriteTile tileImage;
-		private int tileID;
+		public SpriteTile tileImage;
+		public int tileID { get; set; }
+		public Vector2 position { get; set; }
+		public string imageName { get; set; }
+		
+		public Tile()
+		{
+		}
 		
 		public Tile ( int ID, string image )
 		{
-			
+			imageName = image;
+		}
+		
+		public void SetValues( Vector2 a_v2Pos, string a_sImageName )
+		{
+			position = new Vector2();
+			position = a_v2Pos;
+			imageName = a_sImageName;
 		}
 	}
 }

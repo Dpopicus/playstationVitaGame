@@ -1,14 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CrateFighter\Player.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CrateFighter\Level.cs">
     <Files>
-      <File FileName="CrateFighter\Animation.cs" Line="99" Column="34" />
-      <File FileName="CrateFighter\Level.cs" Line="22" Column="3" />
-      <File FileName="CrateFighter\Tile.cs" Line="24" Column="39" />
-      <File FileName="CrateFighter\TerrainObjects.cs" Line="21" Column="10" />
-      <File FileName="CrateFighter\Enemy.cs" Line="10" Column="22" />
-      <File FileName="c:\Users\Harley\Documents\GitHub\playstationVitaGame\GAME\CrateFighter\Support.cs" Line="143" Column="1" />
-      <File FileName="CrateFighter\Player.cs" Line="98" Column="40" />
+      <File FileName="CrateFighter\Animation.cs" Line="101" Column="28" />
+      <File FileName="CrateFighter\Level.cs" Line="87" Column="50" />
+      <File FileName="CrateFighter\Tile.cs" Line="21" Column="9" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -19,7 +15,7 @@
               <Node name="levels" expanded="True" />
               <Node name="sfx" expanded="True" />
             </Node>
-            <Node name="AppMain.cs" selected="True" />
+            <Node name="Level.cs" selected="True" />
           </Node>
         </State>
       </Pad>
