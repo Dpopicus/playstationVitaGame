@@ -414,29 +414,29 @@
   </data>
  </layer>
  <objectgroup name="Grounds" width="20" height="20">
-  <object x="31" y="607" width="257" height="24"/>
-  <object x="292" y="513" width="123" height="15"/>
-  <object x="421" y="448" width="187" height="18"/>
-  <object x="101" y="225" width="537" height="29"/>
-  <object x="229" y="139" width="21" height="19"/>
-  <object x="325" y="96" width="22" height="20"/>
+  <object x="101" y="224" width="537" height="32"/>
+  <object x="223" y="124" width="32" height="32"/>
+  <object x="320" y="97" width="32" height="32"/>
   <object x="614" y="141" width="19" height="17"/>
   <object x="31" y="4" width="605" height="25"/>
   <object x="29" y="352" width="347" height="32"/>
+  <object x="289" y="515" width="347" height="32"/>
+  <object x="416" y="450" width="347" height="32"/>
+  <object x="33" y="611" width="347" height="32"/>
  </objectgroup>
  <objectgroup name="Walls" width="20" height="20">
-  <object x="1" y="4" width="28" height="627"/>
-  <object x="288" y="515" width="18" height="91"/>
-  <object x="416" y="451" width="19" height="77"/>
+  <object x="1" y="4" width="29" height="629"/>
+  <object x="288" y="515" width="32" height="91"/>
+  <object x="416" y="450" width="32" height="77"/>
   <object x="607" y="255" width="35" height="196"/>
-  <object x="367" y="355" width="15" height="27"/>
-  <object x="96" y="228" width="13" height="21"/>
+  <object x="351" y="352" width="32" height="32"/>
+  <object x="100" y="224" width="32" height="32"/>
   <object x="223" y="32" width="31" height="123"/>
-  <object x="320" y="99" width="30" height="125"/>
+  <object x="321" y="98" width="32" height="125"/>
   <object x="607" y="31" width="31" height="123"/>
  </objectgroup>
  <objectgroup name="Objectives" width="20" height="20">
-  <object name="Spawn" x="42" y="560" width="43" height="32"/>
+  <object name="Spawn" x="52" y="551" width="43" height="32"/>
   <object name="End" x="622" y="161" width="15" height="60"/>
  </objectgroup>
 </map>

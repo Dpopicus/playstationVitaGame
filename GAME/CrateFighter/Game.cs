@@ -23,6 +23,8 @@ namespace CrateFighter
 		public SoundPlayer soundPlayer;
 		public static Game Instance;	//Singleton instance of this game state
 		
+		public Level levelOneTest; //Class test to load in a level from Tiled level editor XML doc
+		
 		public NoCleanupScene SplashScreen;	//The level begin splash screen
 		public NoCleanupScene GameScene;	//The first game scene for testing gameplay
 		
@@ -34,8 +36,8 @@ namespace CrateFighter
 		
 		public Player playerInstance;	//Instance of the player class
 		
-		public Ground ground;
-		public Wall leftWall;
+		//public Ground ground;
+		//public Wall leftWall;
 		
 		public Enemy enemyInstance;
 		
@@ -106,11 +108,13 @@ namespace CrateFighter
 			Support.MusicSystem.Instance.PlayNoClobber("Ackman.mp3", true);	//Play some music for the first level
 			
 			playerInstance = new Player();	//Create a player
-			enemyInstance = new Enemy();
+			//enemyInstance = new Enemy();
 			guiTest = new GUI();
 			
-			ground = new Ground( "Application/assets/platformPlaceholder.png", 0, 0, 1000, 25 );
-			//leftWall = new Wall( "Application/assets/platformPlaceholder.png", 0, 0, 50, 500 );
+			//ground = new Ground( "Application/assets/platformPlaceholder.png", 0, 0, 1000, 25 );
+			
+			levelOneTest = new Level();
+			levelOneTest.LoadLevel(1);
 		}
 		
 		public void TickGame(float dt)
@@ -128,13 +132,18 @@ namespace CrateFighter
 		private void UpdateGame()
 		{
 			playerInstance.Update();
-			enemyInstance.Update();
+			//enemyInstance.Update();
 			GetPlayerPos();
 		}
 		
 		public void GetPlayerPos()
 		{
-			enemyInstance.GetPlayerPos ( playerInstance.GetPosition().X, playerInstance.GetPosition().Y );
+			//enemyInstance.GetPlayerPos ( playerInstance.GetPosition().X, playerInstance.GetPosition().Y );
+		}
+		
+		public void DamagePlayer()
+		{
+			playerInstance.DamagePlayer();
 		}
 	}
 }

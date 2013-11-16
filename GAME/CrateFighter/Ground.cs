@@ -37,6 +37,17 @@ namespace CrateFighter
 			this.Set ( groundPosition, width, height );
 		}
 		
+		public Ground ( int xPos, int yPos, int width, int height )
+		{
+			if ( groundList.instance == null )
+				groundList.instance = new groundList();
+			this.SetTerrainType(TerrainType.Ground);
+			groundPosition = new Vector2( xPos, yPos );
+			groundSize = new Vector2( width, height );
+			groundList.instance.AddgroundObject(this);
+			this.Set( groundPosition, width, height );
+		}
+		
 		public Vector2 GetSize()
 		{
 			return groundSize;

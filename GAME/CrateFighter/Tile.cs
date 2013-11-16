@@ -20,6 +20,7 @@ namespace CrateFighter
 	{
 		public SpriteTile tileImage;
 		public int tileID { get; set; }
+		public int tileSize { get; set; }
 		public Vector2 position { get; set; }
 		public string imageName { get; set; }
 		
@@ -27,16 +28,20 @@ namespace CrateFighter
 		{
 		}
 		
-		public Tile ( int ID, string image )
-		{
-			imageName = image;
-		}
-		
 		public void SetValues( Vector2 a_v2Pos, string a_sImageName )
 		{
 			position = new Vector2();
 			position = a_v2Pos;
 			imageName = a_sImageName;
+		}
+		
+		public void Activate()
+		{//Creates a sprite for this tile, moves it to the correct position and adds it to the scene
+			if ( imageName != null )
+				tileImage = Support.SpriteFromFile(("Application/assets/levels/" + imageName + ".jpg"), tileSize, tileSize, position.X, position.Y );
+			else
+				return;
+			Game.Instance.GameScene.AddChild(tileImage, -1);
 		}
 	}
 }

@@ -19,7 +19,9 @@ namespace CrateFighter
 	enum AnimationState
 	{
 		Idle = 1,
-		Walk = 2
+		Walk = 2,
+		Attack = 3,
+		Blocking = 4
 	}
 	
 	public class Player : boxCollider
@@ -33,6 +35,10 @@ namespace CrateFighter
 		private Vector2 attackPosition;
 		private int attackWidth;
 		private int attackHeight;
+		private int attackCombo; // alternates between the players three attack moves
+		
+		public int Health;
+		private int Damage; // int that refers to the players current damage output
 		
 		private boxCollider Attack;
 		
@@ -46,17 +52,26 @@ namespace CrateFighter
 		
 		private float CurrentMovementSpeed;
 		private float NormalMovementSpeed;	//The normal walking speed for the player
-		private float SprintingMovementSpeed;
+		//private float SprintingMovementSpeed;
 		
 		AnimationState CurrentAnimationState;
 		Animation CurrentAnimation;
 		Animation IdleAnimation;
 		Animation WalkAnimation;
+		Animation AttackAnimation1; // punch
+		Animation AttackAnimation2; // mid kick
+		Animation AttackAnimation3; // low kick
+		Animation AttackAnimation4; // high kick
+		Animation BlockAnimation; // block to negate damage
 		
 		private bool moveLeft;
 		private bool moveRight;
 		
-		private bool HealdDown; //checks if attack is being heald down (dan wtf is heald) you dont know how to spell held? -_-
+		private bool Blocking;
+		
+		private int AttackFrameTimer;
+		
+		private bool AttackHeld; //checks if attack is being held down (dan wtf is heald) you dont know how to spell held? -_-
 		private bool enemyHit; // checks if any of the attack collisions went through, used to avoid counting damage multiple times per hit
 		
 		private bool Jump;
@@ -87,9 +102,9 @@ namespace CrateFighter
 			//\Set up player animations
 			//\====================================
 			
-			playerWidth = 46;
-			playerHeight = 109;
-			HealdDown = false;
+			playerWidth = 46/2;
+			playerHeight = 109/2;
+			AttackHeld = false;
 			enemyHit = false;
 			lastDirection = true;	//Set last direction to facing left
 			
@@ -99,16 +114,56 @@ namespace CrateFighter
 			IdleAnimation.Move ( playerPosition );
 			IdleAnimation.Resize( playerWidth, playerHeight );
 			
+			Health = 5;
+			Damage = 50;
+			
 			//Player run animation
 			WalkAnimation = new Animation();
-			WalkAnimation.LoadAnimation("SamuraiRun");
+			WalkAnimation.LoadAnimation("CatWalk");
 			WalkAnimation.Move ( playerPosition );
 			WalkAnimation.Resize( playerWidth, playerHeight );
 			WalkAnimation.SetView( false );	//This animation is not used from the start, so we want to hide it from view
 			
+			//Player attack animation 1
+			AttackAnimation1 = new Animation();
+			AttackAnimation1.LoadAnimation("OneFramePunch");
+			AttackAnimation1.Move ( playerPosition );
+			AttackAnimation1.Resize( (playerWidth + attackWidth), playerHeight );
+			AttackAnimation1.SetView( false );	//This animation is not used from the start, so we want to hide it from view
+			
+			//Player attack animation 2
+			AttackAnimation2 = new Animation();
+			AttackAnimation2.LoadAnimation("OneFrameMidKick");
+			AttackAnimation2.Move ( playerPosition );
+			AttackAnimation2.Resize( (playerWidth + attackWidth), playerHeight );
+			AttackAnimation2.SetView( false );	//This animation is not used from the start, so we want to hide it from view
+			
+			//Player attack animation 3
+			AttackAnimation3 = new Animation();
+			AttackAnimation3.LoadAnimation("OneFrameLowKick");
+			AttackAnimation3.Move ( playerPosition );
+			AttackAnimation3.Resize( (playerWidth + attackWidth), playerHeight );
+			AttackAnimation3.SetView( false );	//This animation is not used from the start, so we want to hide it from view
+			
+			//Player attack animation 4
+			AttackAnimation4 = new Animation();
+			AttackAnimation4.LoadAnimation("OneFrameHighKick");
+			AttackAnimation4.Move ( playerPosition );
+			AttackAnimation4.Resize( (playerWidth + attackWidth), playerHeight );
+			AttackAnimation4.SetView( false );	//This animation is not used from the start, so we want to hide it from view
+			
+			//Player block animation
+			BlockAnimation = new Animation();
+			BlockAnimation.LoadAnimation("CatBlock");
+			BlockAnimation.Move ( playerPosition );
+			BlockAnimation.Resize( (playerWidth + attackWidth), playerHeight );
+			BlockAnimation.SetView( false );	//This animation is not used from the start, so we want to hide it from view
+			
 			CurrentAnimation = IdleAnimation;
 			CurrentAnimationState = AnimationState.Idle;
 			
+			attackCombo = 1;
+			AttackFrameTimer = 0;
 			//\====================================
 			//\Set up stuff for combat mechanics
 			//\====================================
@@ -118,8 +173,8 @@ namespace CrateFighter
 			attackHeight = 35;
 			
 			SpawnPoint = new Vector2();
-			SpawnPoint.X = 100;//This will be read in from the level data later on
-			SpawnPoint.Y = 100;
+			SpawnPoint.X = 10;//This will be read in from the level data later on
+			SpawnPoint.Y = 640;
 			playerPosition.X = SpawnPoint.X;	//Set the players initial x position
 			playerPosition.Y = SpawnPoint.Y;	//Set the players initial y position
 			previousPosition = playerPosition;
@@ -128,13 +183,13 @@ namespace CrateFighter
 		
 			isFalling = true;
 			NormalMovementSpeed = 10.0f;
-			SprintingMovementSpeed = 20.0f;
+			//SprintingMovementSpeed = 20.0f;
 			CurrentMovementSpeed = NormalMovementSpeed;
 			VerticalVelocity = 0.0f;
 			MaxFallingSpeed = 15.0f;
-			JumpStrength = 120.0f;	//How much the players vertical velocity is changed when it jumps
+			JumpStrength = 60.0f;	//How much the players vertical velocity is changed when it jumps
 			GravityStrength = 2.0f;
-			
+			Blocking = false;
 		}
 		
 		public void MovePlayer( float xPos, float yPos )
@@ -170,6 +225,7 @@ namespace CrateFighter
 					CurrentAnimation.SetView(true);	//Unhide this animation
 				}
 				break;
+				
 			case AnimationState.Walk:
 				if (!isMoving)
 				{//Enters here when we want to change to the idle animation state
@@ -177,6 +233,70 @@ namespace CrateFighter
 					CurrentAnimation.SetView(false);
 					CurrentAnimation = IdleAnimation;
 					CurrentAnimation.SetView(true);
+				}
+				break;
+				
+			case AnimationState.Attack:
+				//penalty for attacking is the player cant move whilst attacking
+				CurrentMovementSpeed = 0;
+				CurrentAnimation.SetView(false); // starting to see some problems with how ive implemented animations here
+				if (attackCombo == 1)
+				{
+					CurrentAnimation = AttackAnimation1;
+				}
+				if (attackCombo == 2)
+				{
+					CurrentAnimation = AttackAnimation2;
+				}
+				if (attackCombo == 3)
+				{
+					CurrentAnimation = AttackAnimation3;
+				}
+				if (attackCombo == 4)
+				{
+					CurrentAnimation = AttackAnimation4;
+				}
+				CurrentAnimation.SetView(true);
+				
+				if (attackCombo > 4)
+				{
+					attackCombo = 1;
+				}
+				
+				if (AttackFrameTimer == 7) // returns movement speed to normal, allows for another attack and changes the state to idle
+				{
+					CurrentMovementSpeed = NormalMovementSpeed;
+					CurrentAnimationState = AnimationState.Idle;
+					CurrentAnimation.SetView(false);
+					CurrentAnimation = IdleAnimation;
+					CurrentAnimation.SetView(true);
+					AttackHeld = false;
+					AttackFrameTimer = 0;
+				}
+				++AttackFrameTimer;
+				Blocking = false;
+				break; 
+				
+			case AnimationState.Blocking:
+				
+				AttackHeld = false;// to stop the blocking and atack states conflicting with eachother
+				AttackFrameTimer = 0;
+				
+				if(CurrentAnimation != BlockAnimation)
+				{
+					Blocking = true;
+					CurrentAnimation.SetView(false);
+					CurrentAnimation = BlockAnimation;
+					CurrentAnimation.SetView(true);
+				}
+				if ( (PadData.Buttons & GamePadButtons.Triangle) == 0) 
+				{
+					CurrentMovementSpeed = NormalMovementSpeed;
+					CurrentAnimationState = AnimationState.Idle;
+					CurrentAnimation.SetView(false);
+					CurrentAnimation = IdleAnimation;
+					CurrentAnimation.SetView(true);
+					Blocking = false;
 				}
 				break;
 			}
@@ -203,6 +323,26 @@ namespace CrateFighter
 			
 			if ( (PadData.Buttons & GamePadButtons.Circle) != 0 )
 				Respawn ();//Send the player back to spawn in pressed circle
+			if (Health == 0)
+			{
+				Respawn();
+			}
+			//if statements to make sure the player only attacks once per square press
+			if ( (PadData.Buttons & GamePadButtons.Square) != 0 && (!AttackHeld))
+			{
+				CurrentMovementSpeed = 0;
+				checkRange();//attack
+				CurrentAnimationState = AnimationState.Attack;
+				AttackHeld = true;
+				++attackCombo;
+			}
+			
+			if ( (PadData.Buttons & GamePadButtons.Triangle) != 0)
+			{
+				CurrentMovementSpeed = 0;
+				CurrentAnimationState = AnimationState.Blocking;
+			}
+				
 			
 			//Set flags to say the player is trying to move left or right this frame
 			moveLeft = ((PadData.AnalogLeftX < 0.0f ) || ((PadData.Buttons & GamePadButtons.Left) != 0)) ? true : false;
@@ -215,7 +355,7 @@ namespace CrateFighter
 				lastDirection = false;
 			
 			//Sprite in holding down square
-			CurrentMovementSpeed = ((PadData.Buttons & GamePadButtons.Square) != 0) ? SprintingMovementSpeed : NormalMovementSpeed;
+			//CurrentMovementSpeed = ((PadData.Buttons & GamePadButtons.Square) != 0) ? SprintingMovementSpeed : NormalMovementSpeed;
 			
 			//If the player isn't already in the air, check for jump
 			if ( !isFalling )
@@ -463,7 +603,7 @@ namespace CrateFighter
 						}
 						if (enemyHit )
 						{
-							EnemyList.instance.enemyObjects[i].health -= 50;
+							EnemyList.instance.enemyObjects[i].TakeDamage(Damage);
 						}
 					}
 				}
@@ -475,7 +615,15 @@ namespace CrateFighter
 			playerPosition = SpawnPoint;
 			CurrentAnimation.Move(playerPosition);
 			isFalling = true;
-			VerticalVelocity = 0.0f;
+			VerticalVelocity = 0.0f;	
+			Health = 5;
+		}
+		
+		public void DamagePlayer()
+		{
+			//check if blocking
+			if(!Blocking)
+				Health -= 1;
 		}
 	}
 }

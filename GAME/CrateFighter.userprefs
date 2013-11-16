@@ -1,10 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CrateFighter\Level.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CrateFighter\Game.cs">
     <Files>
-      <File FileName="CrateFighter\Animation.cs" Line="101" Column="28" />
-      <File FileName="CrateFighter\Level.cs" Line="87" Column="50" />
-      <File FileName="CrateFighter\Tile.cs" Line="21" Column="9" />
+      <File FileName="CrateFighter\Animation.cs" Line="93" Column="1" />
+      <File FileName="CrateFighter\Support.cs" Line="153" Column="4" />
+      <File FileName="CrateFighter\Level.cs" Line="48" Column="117" />
+      <File FileName="CrateFighter\Tile.cs" Line="21" Column="20" />
+      <File FileName="CrateFighter\Player.cs" Line="96" Column="53" />
+      <File FileName="CrateFighter\Game.cs" Line="110" Column="18" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -13,11 +16,13 @@
             <Node name="assets" expanded="True">
               <Node name="animations" expanded="True" />
               <Node name="levels" expanded="True" />
-              <Node name="sfx" expanded="True" />
             </Node>
-            <Node name="Level.cs" selected="True" />
+            <Node name="Game.cs" selected="True" />
           </Node>
         </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

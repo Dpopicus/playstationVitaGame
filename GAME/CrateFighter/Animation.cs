@@ -25,6 +25,7 @@ namespace CrateFighter
 		private int currentFrame;
 		private SpriteUV image;
 		private float viewTime;	//This is how many frames this animation has been viewing for
+		public bool LastFrame { get; set; }
 		
 		public Animation ()
 		{
@@ -69,9 +70,12 @@ namespace CrateFighter
 			if ( currentFrame == frames.Count )
 			{//Enters here if we have reached the end of the animation
 				currentFrame = 1;
+				LastFrame = true;
 			}
 			else
+			{
 				++currentFrame;
+			}
 			
 			image.UV.T = frames[currentFrame-1].UVMin;
 			//for some reason you only have to change the minUV coordinates

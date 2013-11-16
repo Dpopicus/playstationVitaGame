@@ -49,7 +49,6 @@
     <Compile Include="..\..\MAINMENU\menu.cs">
       <Link>menu.cs</Link>
     </Compile>
-    <Compile Include="Player.cs" />
     <Compile Include="GUI.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="boxCollider.cs" />
@@ -60,6 +59,7 @@
     <Compile Include="Animation.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Tile.cs" />
+    <Compile Include="Player.cs" />
   </ItemGroup>
   <ItemGroup>
     <ShaderProgram Include="shaders\Simple.fcg" />
@@ -103,5 +103,46 @@
     <Content Include="assets\animations\CatStunned.jpg" />
     <Content Include="assets\animations\CatKick.xml" />
     <Content Include="assets\animations\CatStunned.xml" />
+    <Content Include="assets\levels\fail.jpg" />
+    <Content Include="assets\levels\heart.jpg" />
+    <Content Include="assets\animations\1Hit.jpg" />
+    <Content Include="assets\animations\2Hits.jpg" />
+    <Content Include="assets\animations\3Hits.jpg" />
+    <Content Include="assets\animations\4Hits.jpg" />
+    <Content Include="assets\animations\5HITS.jpg" />
+    <Content Include="assets\animations\CatBlock.jpg" />
+    <Content Include="assets\animations\Gui.jpg" />
+    <Content Include="assets\animations\Mon1Attack.jpg" />
+    <Content Include="assets\animations\Mon1Death.jpg" />
+    <Content Include="assets\animations\Mon1Idle.jpg" />
+    <Content Include="assets\animations\Mon1Walk.jpg" />
+    <Content Include="assets\animations\OneFrameHighKick.jpg" />
+    <Content Include="assets\animations\OneFrameLowKick.jpg" />
+    <Content Include="assets\animations\OneFrameMidKick.jpg" />
+    <Content Include="assets\animations\OneFramePunch.jpg" />
+    <Content Include="assets\animations\QuickKick.jpg" />
+    <Content Include="assets\animations\QuickKick2.jpg" />
+    <Content Include="assets\animations\1Hit.xml" />
+    <Content Include="assets\animations\3Hits.xml" />
+    <Content Include="assets\animations\4Hits.xml" />
+    <Content Include="assets\animations\5HITS.xml" />
+    <Content Include="assets\animations\CatBlock.xml" />
+    <Content Include="assets\animations\Filename.xml" />
+    <Content Include="assets\animations\Gui.xml" />
+    <Content Include="assets\animations\Mon1Attack.xml" />
+    <Content Include="assets\animations\Mon1Death.xml" />
+    <Content Include="assets\animations\Mon1Idle.xml" />
+    <Content Include="assets\animations\Mon1Walk.xml" />
+    <Content Include="assets\animations\OneFrameHighKick.xml" />
+    <Content Include="assets\animations\OneFrameLowKick.xml" />
+    <Content Include="assets\animations\OneFrameMidKick.xml" />
+    <Content Include="assets\animations\OneFramePunch.xml" />
+    <Content Include="assets\animations\QuickKick.xml" />
+    <Content Include="assets\animations\QuickKick2.xml" />
+    <Content Include="assets\levels\levelTwo.xml" />
+    <Content Include="assets\levels\levelTwo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\animations\2Hits.xml" />
   </ItemGroup>
 </Project>
