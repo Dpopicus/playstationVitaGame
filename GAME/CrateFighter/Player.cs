@@ -119,7 +119,7 @@ namespace CrateFighter
 			
 			//Player run animation
 			WalkAnimation = new Animation();
-			WalkAnimation.LoadAnimation("CatWalk");
+			WalkAnimation.LoadAnimation("catWalk");
 			WalkAnimation.Move ( playerPosition );
 			WalkAnimation.Resize( playerWidth, playerHeight );
 			WalkAnimation.SetView( false );	//This animation is not used from the start, so we want to hide it from view

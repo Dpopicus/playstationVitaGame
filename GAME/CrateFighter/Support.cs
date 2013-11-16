@@ -140,6 +140,7 @@ namespace CrateFighter
 		{
 			if (TextureCache.ContainsKey(filename) == false)
 			{
+				TextureCache[filename] = new Texture2D(filename, false);
 				TextureInfoCache[filename] = new TextureInfo(TextureCache[filename], new Vector2i(x, y));
 			}
 			

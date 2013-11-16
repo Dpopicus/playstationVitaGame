@@ -56,10 +56,10 @@
     <Compile Include="Wall.cs" />
     <Compile Include="TerrainObjects.cs" />
     <Compile Include="BaseTerrain.cs" />
-    <Compile Include="Animation.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="Animation.cs" />
   </ItemGroup>
   <ItemGroup>
     <ShaderProgram Include="shaders\Simple.fcg" />
@@ -86,10 +86,6 @@
     <Content Include="assets\sfx\jump2.wav" />
     <Content Include="assets\sfx\jump3.wav" />
     <Content Include="assets\sfx\jump4.wav" />
-    <Content Include="assets\animations\catWalk.jpg" />
-    <Content Include="assets\animations\catWalk.xml" />
-    <Content Include="assets\animations\catIdle.jpg" />
-    <Content Include="assets\animations\catIdle.xml" />
     <Content Include="assets\Ackman.mp3" />
     <Content Include="assets\platformPlaceholder.png" />
     <Content Include="assets\playerSprites2.png" />
@@ -141,6 +137,10 @@
     <Content Include="assets\animations\QuickKick2.xml" />
     <Content Include="assets\levels\levelTwo.xml" />
     <Content Include="assets\levels\levelTwo.png" />
+    <Content Include="assets\animations\catIdle.jpg" />
+    <Content Include="assets\animations\catWalk.jpg" />
+    <Content Include="assets\animations\catIdle.xml" />
+    <Content Include="assets\animations\catWalk.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\animations\2Hits.xml" />
