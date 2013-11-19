@@ -308,7 +308,7 @@ namespace CrateFighter
 				if(OnScreen ) // before we do anything we check if the enemy is still on screen as we need to check  this regardless and to do any other kind of checks before this one would be superflous
 				{
 					float playerDistance = Game.Instance.playerInstance.GetPosition().X - enemyPosition.X;
-					if (( playerDistance > 25 ) || ( playerDistance < -25 ))
+					if (( playerDistance > 95 ) || ( playerDistance < -25 ))
 						CurrentBehavioralState = BehavioralState.state_Follow;
 					FollowPlayer();
 					//if moveright = true faceright
