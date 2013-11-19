@@ -144,5 +144,13 @@
     <Content Include="assets\sfx\attack2.wav" />
     <Content Include="assets\sfx\attack3.wav" />
     <Content Include="assets\levels\levelTwo.png" />
+    <Content Include="assets\animations\Mon2Death.jpg" />
+    <Content Include="assets\animations\Mon2Idle.jpg" />
+    <Content Include="assets\animations\Mon2Walk.jpg" />
+    <Content Include="assets\animations\Mon2Attack.jpg" />
+    <Content Include="assets\animations\Mon2Attack.xml" />
+    <Content Include="assets\animations\Mon2Death.xml" />
+    <Content Include="assets\animations\Mon2Idle.xml" />
+    <Content Include="assets\animations\Mon2Walk.xml" />
   </ItemGroup>
 </Project>

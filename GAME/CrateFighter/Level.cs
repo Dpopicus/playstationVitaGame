@@ -153,7 +153,7 @@ namespace CrateFighter
 							int xPos = int.Parse (enemySpawn.Attribute("x").Value);
 							int yPos = -int.Parse (enemySpawn.Attribute("y").Value);
 							yPos += levelHeight;
-							Enemy en = new Enemy();
+							Enemy en = new Enemy(1);
 							en.SetSpawn( xPos, yPos );
 							en.MoveEnemy( xPos, yPos );
 						}

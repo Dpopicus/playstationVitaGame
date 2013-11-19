@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Sce.PlayStation.Core;
-using Sce.PlayStation.Core.Audio;
+
 using Sce.PlayStation.HighLevel.GameEngine2D;
 using Sce.PlayStation.HighLevel.GameEngine2D.Base;
 
@@ -41,11 +41,6 @@ namespace CrateFighter
 		Animation KickAnimation;
 		Animation StunnedAnimation;
 		
-		public SoundPlayer enemySoundPlayer;
-		Sound hitOneSound;
-		Sound hitTwoSound;
-		Sound hitThreeSound;
-		
 		BehavioralState CurrentBehavioralState;
 		
 		
@@ -57,7 +52,7 @@ namespace CrateFighter
 		
 		private bool Falling;
 		
-		public Enemy ()
+		public Enemy (int iType)
 		{
 			if ( EnemyList.instance == null )
 				EnemyList.instance = new EnemyList();
@@ -65,10 +60,10 @@ namespace CrateFighter
 			enemyPosition.Y = 400;
 			PlayerPosition.X = 100;
 			PlayerPosition.Y = 100;
-			enemySize.X = 70/2;
-			enemySize.Y = 70/2;
-			enemyWidth = 70/2;
-			enemyHeight = 70/2;
+			enemySize.X = 70;
+			enemySize.Y = 70;
+			enemyWidth = 70;
+			enemyHeight = 70;
 			TouchingLeft = false;
 			TouchingRight = false;
 			shouldDie = false;
@@ -76,39 +71,65 @@ namespace CrateFighter
 			CurrentFallSpeed = - 5.0f;
 			
 			EnemyList.instance.AddEnemyObject(this);
-			NormalMovementSpeed = 3.5f;
+			NormalMovementSpeed = 9.0f;
 			MoveLeft = false;
 			MoveRight = false;
 			health = 100;
 			facingRight = false;
 			
-			hitOneSound = new Sound("Application/assets/sfx/attack1.wav");
-			hitTwoSound = new Sound("Application/assets/sfx/attack2.wav");
-			hitThreeSound = new Sound("Application/assets/sfx/attack3.wav");
-			
 			attackFrame = 0;
-			IdleAnimation = new Animation();
-			IdleAnimation.LoadAnimation("Mon1Idle");
-			IdleAnimation.Move ( enemyPosition );
-			IdleAnimation.Resize( enemyWidth, enemyHeight );
 			
-			WalkAnimation = new Animation();
-			WalkAnimation.LoadAnimation("Mon1Walk");
-			WalkAnimation.Move ( enemyPosition );
-			WalkAnimation.Resize( enemyWidth, enemyHeight );
-			WalkAnimation.SetView( false );
+			if (iType == 0)
+			{
+				IdleAnimation = new Animation();
+				IdleAnimation.LoadAnimation("Mon1Idle");
+				IdleAnimation.Move ( enemyPosition );
+				IdleAnimation.Resize( enemyWidth, enemyHeight );
+				
+				WalkAnimation = new Animation();
+				WalkAnimation.LoadAnimation("Mon1Walk");
+				WalkAnimation.Move ( enemyPosition );
+				WalkAnimation.Resize( enemyWidth, enemyHeight );
+				WalkAnimation.SetView( false );
+				
+				KickAnimation = new Animation();
+				KickAnimation.LoadAnimation("Mon1Attack");
+				KickAnimation.Move ( enemyPosition );
+				KickAnimation.Resize( enemyWidth, enemyHeight );
+				KickAnimation.SetView( false );
+				
+				StunnedAnimation = new Animation();
+				StunnedAnimation.LoadAnimation("Mon1Death");
+				StunnedAnimation.Move ( enemyPosition );
+				StunnedAnimation.Resize( enemyWidth, enemyHeight );
+				StunnedAnimation.SetView( false );
+			}
+			if (iType == 1)
+			{
+				IdleAnimation = new Animation();
+				IdleAnimation.LoadAnimation("Mon2Idle");
+				IdleAnimation.Move ( enemyPosition );
+				IdleAnimation.Resize( enemyWidth, enemyHeight );
+				
+				WalkAnimation = new Animation();
+				WalkAnimation.LoadAnimation("Mon2Walk");
+				WalkAnimation.Move ( enemyPosition );
+				WalkAnimation.Resize( enemyWidth, enemyHeight );
+				WalkAnimation.SetView( false );
+				
+				KickAnimation = new Animation();
+				KickAnimation.LoadAnimation("Mon2Attack");
+				KickAnimation.Move ( enemyPosition );
+				KickAnimation.Resize( enemyWidth, enemyHeight );
+				KickAnimation.SetView( false );
+				
+				StunnedAnimation = new Animation();
+				StunnedAnimation.LoadAnimation("Mon2Death");
+				StunnedAnimation.Move ( enemyPosition );
+				StunnedAnimation.Resize( enemyWidth, enemyHeight );
+				StunnedAnimation.SetView( false );
+			}
 			
-			KickAnimation = new Animation();
-			KickAnimation.LoadAnimation("Mon1Attack");
-			KickAnimation.Move ( enemyPosition );
-			KickAnimation.Resize( enemyWidth, enemyHeight );
-			KickAnimation.SetView( false );
-			
-			StunnedAnimation = new Animation();
-			StunnedAnimation.LoadAnimation("Mon1Death");
-			StunnedAnimation.Move ( enemyPosition );
-			StunnedAnimation.Resize( enemyWidth, enemyHeight );
-			StunnedAnimation.SetView( false );
 			
 			CurrentAnimation = IdleAnimation;
 			CurrentBehavioralState = BehavioralState.state_Patrol;
@@ -372,29 +393,12 @@ namespace CrateFighter
 					CurrentBehavioralState = BehavioralState.state_Dying;
 				}
 			}
-			var r = new Random();
-			switch(r.Next (3))
-			{//When the player gets hurt we wanna play a hurt animation
-			case 0:
-				enemySoundPlayer = hitOneSound.CreatePlayer();
-				enemySoundPlayer.Volume = .3f;
-				enemySoundPlayer.Play();
-				break;
-			case 1:
-				enemySoundPlayer = hitTwoSound.CreatePlayer();
-				enemySoundPlayer.Volume = .3f;
-				enemySoundPlayer.Play();
-				break;
-			case 2:
-				enemySoundPlayer = hitThreeSound.CreatePlayer();
-				enemySoundPlayer.Volume = .3f;
-				enemySoundPlayer.Play();
-				break;
-			}
 		}
 		
 		public void FollowPlayer()
 		{
+			if ( CurrentBehavioralState == BehavioralState.state_Attack )
+				return;
 			//not going to check if onscreen first as this function will only be called when on screen
 			if(!TouchingRight)
 			{
