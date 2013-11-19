@@ -21,8 +21,8 @@ namespace CrateFighter
 	public class Animation
 	{
 		private List<Frame> frames;
-		private int frameCount;
-		private int currentFrame;
+		public int frameCount;
+		public int currentFrame;
 		private SpriteUV image;
 		private float viewTime;	//This is how many frames this animation has been viewing for
 		public bool LastFrame { get; set; }
@@ -69,8 +69,8 @@ namespace CrateFighter
 			//or back to the first one if we reach the end
 			if ( currentFrame == frames.Count )
 			{//Enters here if we have reached the end of the animation
-				currentFrame = 1;
 				LastFrame = true;
+				currentFrame = 1;
 			}
 			else
 			{

@@ -91,10 +91,6 @@
     <Content Include="assets\playerSprites2.png" />
     <Content Include="assets\animations\SamuraiRun.jpg" />
     <Content Include="assets\animations\SamuraiRun.xml" />
-    <Content Include="assets\levels\05muronero.jpg" />
-    <Content Include="assets\levels\brick-moss-subsea.jpg" />
-    <Content Include="assets\levels\brick-subsea.jpg" />
-    <Content Include="assets\levels\levelOne.xml" />
     <Content Include="assets\animations\CatKick.jpg" />
     <Content Include="assets\animations\CatStunned.jpg" />
     <Content Include="assets\animations\CatKick.xml" />
@@ -136,13 +132,17 @@
     <Content Include="assets\animations\QuickKick.xml" />
     <Content Include="assets\animations\QuickKick2.xml" />
     <Content Include="assets\levels\levelTwo.xml" />
-    <Content Include="assets\levels\levelTwo.png" />
     <Content Include="assets\animations\catIdle.jpg" />
     <Content Include="assets\animations\catWalk.jpg" />
     <Content Include="assets\animations\catIdle.xml" />
     <Content Include="assets\animations\catWalk.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="assets\animations\2Hits.xml" />
+    <Content Include="assets\animations\2Hits.xml" />
+    <Content Include="assets\sfx\hit1.wav" />
+    <Content Include="assets\sfx\hit2.wav" />
+    <Content Include="assets\sfx\hit3.wav" />
+    <Content Include="assets\sfx\attack1.wav" />
+    <Content Include="assets\sfx\attack2.wav" />
+    <Content Include="assets\sfx\attack3.wav" />
+    <Content Include="assets\levels\levelTwo.png" />
   </ItemGroup>
 </Project>

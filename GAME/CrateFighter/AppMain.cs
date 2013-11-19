@@ -26,29 +26,52 @@ namespace CrateFighter
 		public static bool menuActive = true;	//Should the menu still be viewing?
 		static GraphicsContext graphics;	//Graphics context, only used for the main menu. Changes to using director for the game
 		static CrateFighter.menu mainMenu;
+		private static bool programActive = true;
 		
 		public static void Main (string[] args)
 		{
-			/*Uncomment this to make the main menu work, also read comment on line 50
-			LoadMenu();
-			while (menuActive)
+			while ( programActive )
 			{
-				RunMenu();	
-			}
-			*/
-			
-			Initialize();
-			while (true) {
-				SystemEvents.CheckEvents ();
-				Update ();
-				Render ();
+				LoadMenu();
+				while (menuActive)
+				{
+					RunMenu();	
+				}
+				
+				Initialize();
+				while (true) 
+				{
+					SystemEvents.CheckEvents ();
+					Update ();
+					Render ();
+					var gamePadData = GamePad.GetData (0);	// Query gamepad for current state
+					if ( (gamePadData.Buttons & GamePadButtons.Select) != 0)
+						break;
+				}
+				
+				//Close down the director, unload the game scenes, SHUT DOWN EVERYTHING
+				Game.Instance.Stahp();
+				Game.Instance.GameScene.RemoveAllChildren(true);
+				Game.Instance.GameScene.StopAllActions();
+				Game.Instance.GameScene.UnscheduleAll();
+				Game.Instance.GameScene.Cleanup();
+				Game.Instance.SplashScreen.RemoveAllChildren(true);
+				Game.Instance.SplashScreen.StopAllActions();
+				Game.Instance.SplashScreen.UnscheduleAll();
+				Game.Instance.SplashScreen.Cleanup();
+				Game.Instance.GameScene = null;
+				Game.Instance.SplashScreen = null;
+				Game.Instance = null;
+				Director.Terminate();
+				UISystem.Terminate();
+				menuActive = true;
 			}
 		}
 
 		public static void Initialize ()
 		{
 			//uncomment the next line for main menu
-			//graphics.Dispose();	//Get rid of the old graphics context that is used for the main menu
+			graphics.Dispose();	//Get rid of the old graphics context that is used for the main menu
 			//This can't run at the same time as the Director
 			
 			Director.Initialize();	//Set up the director
@@ -66,7 +89,6 @@ namespace CrateFighter
 			UISystem.Initialize(graphics);	//Start up the UI system using the graphics context
 			mainMenu = new CrateFighter.menu();	//Create a new main menu
 			UISystem.SetScene(mainMenu);	//Set the main menu as the active scene
-			//Support.MusicSystem.Instance.PlayNoClobber("Saber1.mp3", true);	//Loop some music for the main menu
 		}
 		
 		public static void RunMenu()
@@ -86,15 +108,12 @@ namespace CrateFighter
 
 		public static void Update ()
 		{
-			var gamePadData = GamePad.GetData (0);	// Query gamepad for current state
-			
 			Director.Instance.Update();	//Update whatever scene is active
 		}
 
 		public static void Render ()
 		{
 			Director.Instance.Render();	//Draw the current scene
-			
 			Sce.PlayStation.HighLevel.GameEngine2D.Director.Instance.GL.Context.SwapBuffers();	//Present the frame when its ready to draw
 			Director.Instance.PostSwap();	//Dunno what this does lol
 		}

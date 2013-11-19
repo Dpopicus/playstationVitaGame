@@ -32,6 +32,10 @@ namespace CrateFighter
 		Sound jumpThreeSound;
 		Sound jumpFourSound;
 		
+		Sound hitOneSound;
+		Sound hitTwoSound;
+		Sound hitThreeSound;
+		
 		private Vector2 attackPosition;
 		private int attackWidth;
 		private int attackHeight;
@@ -52,7 +56,7 @@ namespace CrateFighter
 		
 		private float CurrentMovementSpeed;
 		private float NormalMovementSpeed;	//The normal walking speed for the player
-		//private float SprintingMovementSpeed;
+		private float SprintingMovementSpeed;
 		
 		AnimationState CurrentAnimationState;
 		Animation CurrentAnimation;
@@ -98,6 +102,10 @@ namespace CrateFighter
 			jumpThreeSound = new Sound("/Application/assets/sfx/jump3.wav");
 			jumpFourSound = new Sound("/Application/assets/sfx/jump4.wav");
 			
+			hitOneSound = new Sound("/Application/assets/sfx/hit1.wav");
+			hitTwoSound = new Sound("/Application/assets/sfx/hit2.wav");
+			hitThreeSound = new Sound("/Application/assets/sfx/hit3.wav");
+			
 			//\====================================
 			//\Set up player animations
 			//\====================================
@@ -115,7 +123,7 @@ namespace CrateFighter
 			IdleAnimation.Resize( playerWidth, playerHeight );
 			
 			Health = 5;
-			Damage = 50;
+			Damage = 13;
 			
 			//Player run animation
 			WalkAnimation = new Animation();
@@ -183,11 +191,11 @@ namespace CrateFighter
 		
 			isFalling = true;
 			NormalMovementSpeed = 10.0f;
-			//SprintingMovementSpeed = 20.0f;
+			SprintingMovementSpeed = 15.0f;
 			CurrentMovementSpeed = NormalMovementSpeed;
 			VerticalVelocity = 0.0f;
-			MaxFallingSpeed = 15.0f;
-			JumpStrength = 60.0f;	//How much the players vertical velocity is changed when it jumps
+			MaxFallingSpeed = 7.5f;
+			JumpStrength = 125.0f;	//How much the players vertical velocity is changed when it jumps
 			GravityStrength = 2.0f;
 			Blocking = false;
 		}
@@ -197,6 +205,12 @@ namespace CrateFighter
 			playerPosition.X = xPos;
 			playerPosition.Y = yPos;
 			CurrentAnimation.Move(playerPosition);
+		}
+		
+		public void SetSpawn( float xPos, float yPos )
+		{//Sets the players spawn to this location
+			SpawnPoint.X = xPos;
+			SpawnPoint.Y = yPos;
 		}
 		
 		public void Update()
@@ -263,7 +277,7 @@ namespace CrateFighter
 					attackCombo = 1;
 				}
 				
-				if (AttackFrameTimer == 7) // returns movement speed to normal, allows for another attack and changes the state to idle
+				if (AttackFrameTimer == 10) // returns movement speed to normal, allows for another attack and changes the state to idle
 				{
 					CurrentMovementSpeed = NormalMovementSpeed;
 					CurrentAnimationState = AnimationState.Idle;
@@ -289,7 +303,7 @@ namespace CrateFighter
 					CurrentAnimation = BlockAnimation;
 					CurrentAnimation.SetView(true);
 				}
-				if ( (PadData.Buttons & GamePadButtons.Triangle) == 0) 
+				if ( (PadData.Buttons & GamePadButtons.Circle) == 0) 
 				{
 					CurrentMovementSpeed = NormalMovementSpeed;
 					CurrentAnimationState = AnimationState.Idle;
@@ -321,14 +335,10 @@ namespace CrateFighter
 			//This function is called 60 times per second
 			PadData = GamePad.GetData (0);	//Update the gamepad input
 			
-			if ( (PadData.Buttons & GamePadButtons.Circle) != 0 )
-				Respawn ();//Send the player back to spawn in pressed circle
 			if (Health == 0)
-			{
 				Respawn();
-			}
 			//if statements to make sure the player only attacks once per square press
-			if ( (PadData.Buttons & GamePadButtons.Square) != 0 && (!AttackHeld))
+			if ( (PadData.Buttons & GamePadButtons.Triangle) != 0 && (!AttackHeld) && (!Blocking))
 			{
 				CurrentMovementSpeed = 0;
 				checkRange();//attack
@@ -337,7 +347,7 @@ namespace CrateFighter
 				++attackCombo;
 			}
 			
-			if ( (PadData.Buttons & GamePadButtons.Triangle) != 0)
+			if ( (PadData.Buttons & GamePadButtons.Circle) != 0)
 			{
 				CurrentMovementSpeed = 0;
 				CurrentAnimationState = AnimationState.Blocking;
@@ -348,6 +358,12 @@ namespace CrateFighter
 			moveLeft = ((PadData.AnalogLeftX < 0.0f ) || ((PadData.Buttons & GamePadButtons.Left) != 0)) ? true : false;
 			moveRight = ((PadData.AnalogLeftX > 0.0f ) || ((PadData.Buttons & GamePadButtons.Right) != 0)) ? true : false;
 			
+			if ( Blocking && ( moveLeft || moveRight ) )
+			{//stops the player from moving when blocking
+				moveLeft = false;
+				moveRight = false;
+			}
+			
 			//Keep track of the last direction the player tried to move, for sprite orientation
 			if (moveLeft)
 				lastDirection = true;
@@ -355,7 +371,7 @@ namespace CrateFighter
 				lastDirection = false;
 			
 			//Sprite in holding down square
-			//CurrentMovementSpeed = ((PadData.Buttons & GamePadButtons.Square) != 0) ? SprintingMovementSpeed : NormalMovementSpeed;
+			CurrentMovementSpeed = ((PadData.Buttons & GamePadButtons.Square) != 0) ? SprintingMovementSpeed : NormalMovementSpeed;
 			
 			//If the player isn't already in the air, check for jump
 			if ( !isFalling )
@@ -433,10 +449,24 @@ namespace CrateFighter
 							{
 								if ( desiredLocation.bottomCollide(obj) )
 								{
-									desiredPosition.Y += ( ( obj.position.Y + obj.height ) - desiredPosition.Y );
-									desiredLocation.Set ( desiredPosition, playerWidth, playerHeight );
-									isFalling = false;
-									groundObject = obj;
+									//need to check if we are coming to hit this from the top or bottom
+									if ( playerPosition.Y > obj.position.Y )
+									{//Goes here if we are falling onto the object
+										desiredPosition.Y += ( ( obj.position.Y + obj.height ) - desiredPosition.Y );
+										desiredLocation.Set ( desiredPosition, playerWidth, playerHeight );
+										isFalling = false;
+										groundObject = obj;
+										moveLeft = false;
+										moveRight = false;
+									}
+									else
+									{//otherwise it goes in here, because we are hitting it from the bottom
+										desiredPosition.Y -= ( ( obj.position.Y + obj.height ) - desiredPosition.Y );
+										desiredLocation.Set ( desiredPosition, playerWidth, playerHeight );
+										VerticalVelocity = 0.0f;
+										moveLeft = false;
+										moveRight = false;
+									}
 								}
 							}
 							else
@@ -511,6 +541,8 @@ namespace CrateFighter
 			{
 				for ( int i = 0; i < EnemyList.instance.objectCounter; i++ )
 				{
+					if ( i >= EnemyList.instance.enemyObjects.Count )
+						break;
 					if(EnemyList.instance.enemyObjects[i].OnScreen)
 					{
 						if (EnemyList.instance.enemyObjects[i].GetPosition().X > a_v2DesiredPosition.X  )
@@ -553,7 +585,7 @@ namespace CrateFighter
 			if ( EnemyList.instance != null )
 			{
 				if (!lastDirection ) //move the attack box  before setting it
-					attackPosition.X = ( playerPosition.X + attackWidth );	
+					attackPosition.X = ( playerPosition.X + playerWidth );	
 				if(lastDirection) 
 					attackPosition.X = ( playerPosition.X - attackWidth );
 				
@@ -563,11 +595,13 @@ namespace CrateFighter
 				Attack.Set ( attackPosition, attackWidth, attackHeight ); //update the box collision's information up here so we only need to call it once when we call check range and we dont need to constantly update it
 				for ( int i = 0; i < EnemyList.instance.objectCounter; i++ )
 				{
+					if ( i >= EnemyList.instance.enemyObjects.Count )
+						break;
 					if(EnemyList.instance.enemyObjects[i].OnScreen)
 					{
 						if(!lastDirection )
 						{
-							if (EnemyList.instance.enemyObjects[i].GetPosition().X > attackPosition.X  )
+							if (EnemyList.instance.enemyObjects[i].GetPosition().X > playerPosition.X  )
 							{
 								if(Attack.isColliding(EnemyList.instance.enemyObjects[i]))
 								{
@@ -604,6 +638,7 @@ namespace CrateFighter
 						if (enemyHit )
 						{
 							EnemyList.instance.enemyObjects[i].TakeDamage(Damage);
+							enemyHit = false;
 						}
 					}
 				}
@@ -621,6 +656,26 @@ namespace CrateFighter
 		
 		public void DamagePlayer()
 		{
+			var r = new Random();
+			switch(r.Next (3))
+			{//When the player gets hurt we wanna play a hurt animation
+			case 0:
+				soundPlayerBullet = hitOneSound.CreatePlayer();
+				soundPlayerBullet.Volume = .3f;
+				soundPlayerBullet.Play();
+				break;
+			case 1:
+				soundPlayerBullet = hitTwoSound.CreatePlayer();
+				soundPlayerBullet.Volume = .3f;
+				soundPlayerBullet.Play();
+				break;
+			case 2:
+				soundPlayerBullet = hitThreeSound.CreatePlayer();
+				soundPlayerBullet.Volume = .3f;
+				soundPlayerBullet.Play();
+				break;
+			}
+			
 			//check if blocking
 			if(!Blocking)
 				Health -= 1;

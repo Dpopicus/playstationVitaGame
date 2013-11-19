@@ -131,6 +131,7 @@ namespace CrateFighter
 						{//Loop through the ground objects, adding them into the level
 							int yPos = -int.Parse (groundObject.Attribute("y").Value);
 							yPos += levelHeight;
+							//Ground gr = new Ground( "Application/assets/levels/heart.jpg", int.Parse(groundObject.Attribute("x").Value), yPos, int.Parse(groundObject.Attribute("width").Value), int.Parse(groundObject.Attribute("height").Value) );
 							Ground gr = new Ground( int.Parse(groundObject.Attribute("x").Value), yPos, int.Parse(groundObject.Attribute("width").Value), int.Parse(groundObject.Attribute("height").Value) );
 						}
 					}
@@ -141,12 +142,36 @@ namespace CrateFighter
 							int yPos = -int.Parse (wallObject.Attribute("y").Value);
 							yPos += levelHeight;
 							yPos -= int.Parse(wallObject.Attribute("height").Value);
+							//Wall wl = new Wall( "Application/assets/levels/heart.jpg", int.Parse (wallObject.Attribute("x").Value), yPos, int.Parse(wallObject.Attribute("width").Value), int.Parse(wallObject.Attribute("height").Value) );
 							Wall wl = new Wall( int.Parse (wallObject.Attribute("x").Value), yPos, int.Parse(wallObject.Attribute("width").Value), int.Parse(wallObject.Attribute("height").Value) );
 						}
 					}
-					if (objectgroup.Attribute("name").Value.ToString() == "Objectives")
+					if (objectgroup.Attribute("name").Value.ToString() == "Enemies")
 					{//Loads in objectives of the level
-						
+						foreach (var enemySpawn in objectgroup.Elements ("object"))
+						{//Loop through the list of enemies that will be spawned into the level and add them to the enemy list
+							int xPos = int.Parse (enemySpawn.Attribute("x").Value);
+							int yPos = -int.Parse (enemySpawn.Attribute("y").Value);
+							yPos += levelHeight;
+							Enemy en = new Enemy();
+							en.SetSpawn( xPos, yPos );
+							en.MoveEnemy( xPos, yPos );
+						}
+					}
+					if (objectgroup.Attribute("name").Value.ToString() == "Objectives")
+					{//Set up player spawn, level complete area etc.
+						foreach (var objective in objectgroup.Elements ("object"))
+						{
+							if( objective.Attribute("name").Value.ToString() == "Spawn")
+							{//Load in spawn area info
+								int spawnX = int.Parse (objective.Attribute("x").Value);
+								int spawnY = -int.Parse (objective.Attribute("y").Value);
+								spawnY += levelHeight;
+								Console.Write ("moving player to spawn from xml.\n");
+								Game.Instance.playerInstance.SetSpawn( spawnX, spawnY );//Set the players spawn location
+								Game.Instance.playerInstance.MovePlayer( spawnX, spawnY );//Move the player to the spawn location
+							}
+						}
 					}
 				}
 					

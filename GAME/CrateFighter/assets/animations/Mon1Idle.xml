@@ -1,1 +1,1 @@
-<?xml version="1.0"?><root frame-count="2"><frame time="0.05"><minUV x="0" y="0" /><maxUV x="0.469387755102041" y="1" /></frame><frame time="0.05"><minUV x="0.469387755102041" y="0" /><maxUV x="1" y="0.896551724137931" /></frame></root>
+<?xml version="1.0"?><root frame-count="2"><frame time="1"><minUV x="0" y="0" /><maxUV x="0.5" y="1" /></frame><frame time="1"><minUV x="0.5" y="0" /><maxUV x="1" y="1" /></frame></root>

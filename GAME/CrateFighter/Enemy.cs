@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Sce.PlayStation.Core;
-
+using Sce.PlayStation.Core.Audio;
 using Sce.PlayStation.HighLevel.GameEngine2D;
 using Sce.PlayStation.HighLevel.GameEngine2D.Base;
 
@@ -12,7 +12,8 @@ namespace CrateFighter
 		state_Follow = 1,// when the enemy sees the player and moves towards them
 		state_Patrol = 2,
 		state_Attack = 3,
-		state_Dying = 4
+		state_Dying = 4,
+		state_Dead = 5
 	};
 	public class Enemy : boxCollider
 	{
@@ -28,6 +29,7 @@ namespace CrateFighter
 		public int health;
 		private Vector2 PlayerPosition;
 		private Vector2 SpawnPoint;
+		public bool shouldDie;
 		
 		private int attackFrame; // right now constantly ticks when attacking but may be per touching instance if i can think of a better way
 		
@@ -38,6 +40,11 @@ namespace CrateFighter
 		Animation WalkAnimation;
 		Animation KickAnimation;
 		Animation StunnedAnimation;
+		
+		public SoundPlayer enemySoundPlayer;
+		Sound hitOneSound;
+		Sound hitTwoSound;
+		Sound hitThreeSound;
 		
 		BehavioralState CurrentBehavioralState;
 		
@@ -58,25 +65,28 @@ namespace CrateFighter
 			enemyPosition.Y = 400;
 			PlayerPosition.X = 100;
 			PlayerPosition.Y = 100;
-			enemySize.X = 140;
-			enemySize.Y = 140;
-			enemyWidth = 140;
-			enemyHeight = 140;
+			enemySize.X = 70/2;
+			enemySize.Y = 70/2;
+			enemyWidth = 70/2;
+			enemyHeight = 70/2;
 			TouchingLeft = false;
-			TouchingRight =false;
+			TouchingRight = false;
+			shouldDie = false;
 			OnScreen = false;
 			CurrentFallSpeed = - 5.0f;
+			
 			EnemyList.instance.AddEnemyObject(this);
-			NormalMovementSpeed = 9.0f;
+			NormalMovementSpeed = 3.5f;
 			MoveLeft = false;
 			MoveRight = false;
 			health = 100;
 			facingRight = false;
 			
+			hitOneSound = new Sound("Application/assets/sfx/attack1.wav");
+			hitTwoSound = new Sound("Application/assets/sfx/attack2.wav");
+			hitThreeSound = new Sound("Application/assets/sfx/attack3.wav");
+			
 			attackFrame = 0;
-			
-			//previousPosition = enemyPosition;
-			
 			IdleAnimation = new Animation();
 			IdleAnimation.LoadAnimation("Mon1Idle");
 			IdleAnimation.Move ( enemyPosition );
@@ -187,11 +197,51 @@ namespace CrateFighter
 					}
 				}
 			}
+			if ( wallList.instance != null )
+			{
+				for ( int i = 0; i < wallList.instance.objectCounter; i++ )
+				{
+					if (!( enemyPosition.X <= wallList.instance.wallObjects[i].GetPosition().X ))
+					{//First make sure the player isn't already below the object we are checking collision for
+						if ( enemyPosition.X  <= ( wallList.instance.wallObjects[i].GetPosition().X + wallList.instance.wallObjects[i].GetSize().X )  )
+						{
+							//if we get here in here we need to make sure the player is interacting with the
+						//terrain object, anywhere on the x axis
+							if (( enemyPosition.Y + enemySize.Y ) > wallList.instance.wallObjects[i].GetPosition().Y )
+							{
+								if ( enemyPosition.Y < ( wallList.instance.wallObjects[i].GetPosition().Y + wallList.instance.wallObjects[i].GetSize().Y ) )
+								{
+									MoveRight = false;
+									
+								}
+							}
+						}
+					}
+					if (!( enemyPosition.X >= wallList.instance.wallObjects[i].GetPosition().X ))
+					{//First make sure the player isn't already below the object we are checking collision for
+						if ( enemyPosition.X  >= ( wallList.instance.wallObjects[i].GetPosition().X + wallList.instance.wallObjects[i].GetSize().X )  )
+						{
+							//if we get here in here we need to make sure the player is interacting with the
+							//terrain object, anywhere on the x axis
+							if (( enemyPosition.Y + enemySize.Y ) > wallList.instance.wallObjects[i].GetPosition().Y )
+							{
+								if ( enemyPosition.Y < ( wallList.instance.wallObjects[i].GetPosition().Y + wallList.instance.wallObjects[i].GetSize().Y ) )
+								{
+									MoveLeft = false;
+								}
+							}
+						}
+					}
+				}
+			}
 			UpdatePosition();
 		}
 		
 		public void Update()
 		{
+			if ( CurrentBehavioralState == BehavioralState.state_Dead )
+				return;
+			
 			Falling = true;
 			MoveRight = false;
 			MoveLeft = false;
@@ -236,6 +286,9 @@ namespace CrateFighter
 				// attack damage handling
 				if(OnScreen ) // before we do anything we check if the enemy is still on screen as we need to check  this regardless and to do any other kind of checks before this one would be superflous
 				{
+					float playerDistance = Game.Instance.playerInstance.GetPosition().X - enemyPosition.X;
+					if (( playerDistance > 25 ) || ( playerDistance < -25 ))
+						CurrentBehavioralState = BehavioralState.state_Follow;
 					FollowPlayer();
 					//if moveright = true faceright
 					CurrentAnimation.SetView(false);
@@ -269,10 +322,8 @@ namespace CrateFighter
 					CurrentAnimation.SetView(false);
 					CurrentAnimation = StunnedAnimation;
 					CurrentAnimation.SetView(true);
-					if (CurrentAnimation.LastFrame)
-					{
-						Respawn();
-					}
+					if (CurrentAnimation.currentFrame == CurrentAnimation.frameCount )
+						Respawn ();
 				}
 				else
 				{
@@ -306,10 +357,9 @@ namespace CrateFighter
 		
 		public void Respawn()
 		{
-			enemyPosition.X = SpawnPoint.X;
-			enemyPosition.Y = SpawnPoint.Y;
-			health = 100;
-			StunnedAnimation.LastFrame = false;
+			CurrentBehavioralState = BehavioralState.state_Dead;
+			//StunnedAnimation.LastFrame=false;
+			MoveEnemy( -10000, -10000 );
 		}
 		
 		public void TakeDamage(int iDamage)
@@ -322,9 +372,24 @@ namespace CrateFighter
 					CurrentBehavioralState = BehavioralState.state_Dying;
 				}
 			}
-			if(health <= 0) // rather than checking this every frame only checks when hit
-			{
-				Respawn();
+			var r = new Random();
+			switch(r.Next (3))
+			{//When the player gets hurt we wanna play a hurt animation
+			case 0:
+				enemySoundPlayer = hitOneSound.CreatePlayer();
+				enemySoundPlayer.Volume = .3f;
+				enemySoundPlayer.Play();
+				break;
+			case 1:
+				enemySoundPlayer = hitTwoSound.CreatePlayer();
+				enemySoundPlayer.Volume = .3f;
+				enemySoundPlayer.Play();
+				break;
+			case 2:
+				enemySoundPlayer = hitThreeSound.CreatePlayer();
+				enemySoundPlayer.Volume = .3f;
+				enemySoundPlayer.Play();
+				break;
 			}
 		}
 		

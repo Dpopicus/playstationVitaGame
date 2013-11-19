@@ -2,17 +2,23 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="CrateFighter\Player.cs">
     <Files>
-      <File FileName="CrateFighter\Animation.cs" Line="94" Column="71" />
-      <File FileName="CrateFighter\Support.cs" Line="143" Column="36" />
-      <File FileName="CrateFighter\Level.cs" Line="48" Column="117" />
-      <File FileName="CrateFighter\Tile.cs" Line="21" Column="20" />
-      <File FileName="CrateFighter\Player.cs" Line="25" Column="3" />
-      <File FileName="CrateFighter\Game.cs" Line="110" Column="4" />
+      <File FileName="CrateFighter\AppMain.cs" Line="116" Column="56" />
+      <File FileName="CrateFighter\Game.cs" Line="116" Column="30" />
+      <File FileName="CrateFighter\NoCleanupScene.cs" Line="20" Column="3" />
+      <File FileName="..\MAINMENU\menu.cs" Line="24" Column="1" />
+      <File FileName="CrateFighter\Level.cs" Line="137" Column="7" />
+      <File FileName="CrateFighter\Player.cs" Line="200" Column="21" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="CrateFighter" expanded="True" selected="True" />
+          <Node name="CrateFighter" expanded="True">
+            <Node name="assets" expanded="True">
+              <Node name="animations" expanded="True" />
+              <Node name="levels" expanded="True" />
+            </Node>
+            <Node name="Player.cs" selected="True" />
+          </Node>
         </State>
       </Pad>
       <Pad Id="ClassPad">
@@ -23,5 +29,7 @@
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="CrateFighter\Game.cs" line="75" offsetX="1669" offsetY="1139" expression="SplashScreen" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
 </Properties>
