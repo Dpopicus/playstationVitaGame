@@ -177,7 +177,7 @@ namespace CrateFighter
 			//\====================================
 			
 			attackPosition = playerPosition;
-			attackWidth = 35;
+			attackWidth = 23;
 			attackHeight = 35;
 			
 			SpawnPoint = new Vector2();

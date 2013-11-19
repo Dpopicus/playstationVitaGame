@@ -6,8 +6,10 @@
       <File FileName="CrateFighter\Game.cs" Line="116" Column="30" />
       <File FileName="CrateFighter\NoCleanupScene.cs" Line="20" Column="3" />
       <File FileName="..\MAINMENU\menu.cs" Line="24" Column="1" />
-      <File FileName="CrateFighter\Level.cs" Line="137" Column="7" />
-      <File FileName="CrateFighter\Player.cs" Line="200" Column="21" />
+      <File FileName="CrateFighter\Level.cs" Line="156" Column="30" />
+      <File FileName="CrateFighter\Player.cs" Line="180" Column="20" />
+      <File FileName="CrateFighter\Enemy.cs" Line="247" Column="59" />
+      <File FileName="CrateFighter\Wall.cs" Line="32" Column="49" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">

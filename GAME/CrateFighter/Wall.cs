@@ -42,7 +42,8 @@ namespace CrateFighter
 			if ( wallList.instance == null )
 				wallList.instance = new wallList();
 			this.SetTerrainType(TerrainType.Wall);
-			wallPosition = new Vector2( xPos, yPos );
+			wallPosition.X = xPos;
+			wallPosition.Y = yPos;
 			wallSize = new Vector2( width, height );
 			wallList.instance.AddwallObject(this);
 			this.Set (wallPosition, width, height );

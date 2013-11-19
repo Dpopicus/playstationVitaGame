@@ -222,38 +222,85 @@ namespace CrateFighter
 			{
 				for ( int i = 0; i < wallList.instance.objectCounter; i++ )
 				{
-					if (!( enemyPosition.X <= wallList.instance.wallObjects[i].GetPosition().X ))
-					{//First make sure the player isn't already below the object we are checking collision for
-						if ( enemyPosition.X  <= ( wallList.instance.wallObjects[i].GetPosition().X + wallList.instance.wallObjects[i].GetSize().X )  )
+					if ( i >= wallList.instance.wallObjects.Count  )
+						break;
+					if(!MoveLeft )
+					{
+						if (wallList.instance.wallObjects[i].GetPosition().X > enemyPosition.X  )
 						{
-							//if we get here in here we need to make sure the player is interacting with the
-						//terrain object, anywhere on the x axis
-							if (( enemyPosition.Y + enemySize.Y ) > wallList.instance.wallObjects[i].GetPosition().Y )
+							if(this.isColliding(wallList.instance.wallObjects[i]))
 							{
-								if ( enemyPosition.Y < ( wallList.instance.wallObjects[i].GetPosition().Y + wallList.instance.wallObjects[i].GetSize().Y ) )
-								{
-									MoveRight = false;
-									
-								}
+								MoveRight = false;
+							}
+							if(this.leftCollide(wallList.instance.wallObjects[i]))
+							{
+								MoveRight = false;
+							}
+							if(this.rightCollide(wallList.instance.wallObjects[i]))
+							{
+								MoveRight = false;
 							}
 						}
 					}
-					if (!( enemyPosition.X >= wallList.instance.wallObjects[i].GetPosition().X ))
-					{//First make sure the player isn't already below the object we are checking collision for
-						if ( enemyPosition.X  >= ( wallList.instance.wallObjects[i].GetPosition().X + wallList.instance.wallObjects[i].GetSize().X )  )
+					if(!MoveRight )
+					{
+						if (wallList.instance.wallObjects[i].GetPosition().X < enemyPosition.X  )
 						{
-							//if we get here in here we need to make sure the player is interacting with the
-							//terrain object, anywhere on the x axis
-							if (( enemyPosition.Y + enemySize.Y ) > wallList.instance.wallObjects[i].GetPosition().Y )
+							if(this.isColliding(wallList.instance.wallObjects[i]))
 							{
-								if ( enemyPosition.Y < ( wallList.instance.wallObjects[i].GetPosition().Y + wallList.instance.wallObjects[i].GetSize().Y ) )
-								{
-									MoveLeft = false;
-								}
+								MoveLeft = false;
+							}
+							if(this.leftCollide(wallList.instance.wallObjects[i]))
+							{
+								MoveLeft = false;
+							}
+							if(this.rightCollide(wallList.instance.wallObjects[i]))
+							{
+								MoveLeft = false;
 							}
 						}
 					}
 				}
+				/*for ( int i = 0; i < wallList.instance.objectCounter; i++ )
+				{
+					if (MoveRight )
+					{
+						if (!( enemyPosition.X <= wallList.instance.wallObjects[i].GetPosition().X ))
+						{//First make sure the player isn't already below the object we are checking collision for
+							if ( enemyPosition.X  <= ( wallList.instance.wallObjects[i].GetPosition().X + wallList.instance.wallObjects[i].GetSize().X )  )
+							{
+								//if we get here in here we need to make sure the player is interacting with the
+							//terrain object, anywhere on the x axis
+								if (( (enemyPosition.Y + enemyWidth) + NormalMovementSpeed ) >= wallList.instance.wallObjects[i].GetPosition().Y )
+								{
+									if ( enemyPosition.Y <= ( wallList.instance.wallObjects[i].GetPosition().Y + wallList.instance.wallObjects[i].GetSize().Y ) )
+									{
+										MoveRight = false;
+										
+									}
+								}
+							}
+						}
+					}
+					if (MoveLeft )
+					{
+						if (!( enemyPosition.X >= wallList.instance.wallObjects[i].GetPosition().X ))
+						{//First make sure the player isn't already below the object we are checking collision for
+							if ( (enemyPosition.X + enemyHeight)  >= wallList.instance.wallObjects[i].GetPosition().X  )
+							{
+								//if we get here in here we need to make sure the player is interacting with the
+								//terrain object, anywhere on the x axis
+								if ( enemyPosition.Y >= ( wallList.instance.wallObjects[i].GetPosition().Y + wallList.instance.wallObjects[i].GetSize().Y ) )
+								{
+									if (( enemyPosition.Y - NormalMovementSpeed ) <= (wallList.instance.wallObjects[i].GetPosition().Y + wallList.instance.wallObjects[i].GetSize().Y ))
+									{
+										MoveLeft = false;
+									}
+								}
+							}
+						}
+					}
+				}*/
 			}
 			UpdatePosition();
 		}
@@ -308,7 +355,7 @@ namespace CrateFighter
 				if(OnScreen ) // before we do anything we check if the enemy is still on screen as we need to check  this regardless and to do any other kind of checks before this one would be superflous
 				{
 					float playerDistance = Game.Instance.playerInstance.GetPosition().X - enemyPosition.X;
-					if (( playerDistance > 95 ) || ( playerDistance < -25 ))
+					if (( playerDistance > (25 + enemyWidth) ) || ( playerDistance < -25 ))
 						CurrentBehavioralState = BehavioralState.state_Follow;
 					FollowPlayer();
 					//if moveright = true faceright
